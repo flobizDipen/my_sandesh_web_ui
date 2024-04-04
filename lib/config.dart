@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 class Configuration {
+  final double containerWidth;
+  final double containerHeight;
   final double topMarginPercentage;
   final double leftMarginPercentage;
   final String fontStyle;
@@ -12,6 +14,8 @@ class Configuration {
   final String textContent;
 
   Configuration({
+    required this.containerWidth,
+    required this.containerHeight,
     required this.topMarginPercentage,
     required this.leftMarginPercentage,
     required this.fontStyle,
@@ -61,6 +65,8 @@ Configuration createConfiguration({
   final topMarginPercentage = (textPosition.dy / containerHeight) * 100;
 
   return Configuration(
+    containerWidth: containerWidth,
+    containerHeight: containerHeight,
     topMarginPercentage: topMarginPercentage,
     leftMarginPercentage: leftMarginPercentage,
     fontStyle: fontStyle,

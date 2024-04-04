@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
 import 'package:my_sandesh_web_ui/config.dart';
 import 'package:my_sandesh_web_ui/preview.dart';
 
@@ -44,87 +45,95 @@ class _MyHomePageState extends State<MyHomePage> {
   File? _pickedImage;
   Uint8List webImage = Uint8List(8);
   bool _isTextAdded = false;
-  Offset _textPosition = Offset(0, 0);
+  Offset _textPosition = const Offset(0, 0);
   double _textSize = 14.0;
   Color _textColor = Colors.white; // Default text color
-  TextEditingController _textEditingController = TextEditingController(text: "Company Name");
-  String _fontName = 'Roboto'; // Default font family
+  final TextEditingController _textEditingController = TextEditingController(text: "Company Name");
+  final String _fontName = 'Roboto';
+  AspectRatioOption _selectedAspectRatio = AspectRatioOption.oneToOne;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Column(
-              verticalDirection: VerticalDirection.down,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(
+            width: 30,
+          ),
+          Column(
+            verticalDirection: VerticalDirection.down,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 30,
+              ),
+              aspectRatioButtons(),
+              SizedBox(height: 30,),
+              ElevatedButton(
+                  onPressed: () {
+                    _pickImage();
+                  },
+                  child: const Text("Upload Frame")),
+              const SizedBox(
+                height: 30,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _isTextAdded = true;
+                    });
+                    _showTextOptionsDialog();
+                  },
+                  child: const Text("Add Company Name")),
+              const SizedBox(
+                height: 30,
+              ),
+              ElevatedButton(onPressed: () {}, child: const Text("Add Phone Number")),
+              const SizedBox(
+                height: 30,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    generateConfig();
+                  },
+                  child: const Text("Generate Config")),
+            ],
+          ),
+          const SizedBox(
+            width: 160,
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
                 const SizedBox(
                   height: 30,
                 ),
-                ElevatedButton(
-                    onPressed: () {
+                SizedBox(
+                  width: _selectedAspectRatio.size.width,
+                  height: _selectedAspectRatio.size.height,
+                  child: GestureDetector(
+                    onPanUpdate: (details) {
                       setState(() {
-                        _isTextAdded = true;
+                        _textPosition += details.delta;
                       });
-                      _showTextOptionsDialog();
                     },
-                    child: const Text("Add Company Name")),
-                const SizedBox(
-                  height: 30,
-                ),
-                ElevatedButton(onPressed: () {}, child: const Text("Add Phone Number")),
-                const SizedBox(
-                  height: 60,
-                ),
-                ElevatedButton(
-                    onPressed: () {
-                      _showColorPicker();
-                    },
-                    child: const Text("Change Text Color")),
-              ],
-            ),
-            const SizedBox(
-              width: 160,
-            ),
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  SizedBox(
-                    width: 500,
-                    height: 500,
-                    child: GestureDetector(
-                      onPanUpdate: (details) {
-                        setState(() {
-                          _textPosition += details.delta;
-                        });
-                      },
-                      child: Stack(
-                        children: [
-                          Container(
-                            key: _containerKey,
-                            color: Colors.blueGrey,
-                            child: _pickedImage == null
-                                ? null
-                                : kIsWeb
-                                    ? Image.memory(
-                                        webImage,
-                                        fit: BoxFit.fill,
-                                      )
-                                    : Image.file(
-                                        _pickedImage!,
-                                        fit: BoxFit.fill,
-                                      ),
-                          ),
-                          Positioned(
-                            left: _textPosition.dx,
-                            top: _textPosition.dy,
+                    child: Stack(
+                      children: [
+                        Container(
+                          key: _containerKey,
+                          color: Colors.blueGrey,
+                          child: _pickedImage == null ? null : Image.memory(webImage, fit: BoxFit.fill,),
+                        ),
+                        Positioned(
+                          left: _textPosition.dx,
+                          top: _textPosition.dy,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.red),
+                            ),
                             child: Text(
                               _textEditingController.text,
                               style: TextStyle(
@@ -134,46 +143,18 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                  Slider(
-                    min: 14,
-                    max: 100,
-                    divisions: 86,
-                    value: _textSize,
-                    label: _textSize.round().toString(),
-                    onChanged: (value) {
-                      setState(() {
-                        _textSize = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        _pickImage();
-                      },
-                      child: const Text("Upload Frame")),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        generateConfig();
-                      },
-                      child: const Text("Generate Config")),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(
-              width: 30,
-            )
-          ],
-        ),
+          ),
+          const SizedBox(
+            width: 30,
+          ),
+        ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -222,50 +203,36 @@ class _MyHomePageState extends State<MyHomePage> {
                     labelText: 'Company Name',
                   ),
                   onChanged: (value) {
+                    setState(() {});
+                  },
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                BlockPicker(
+                  pickerColor: _textColor, // Use current text color
+                  onColorChanged: (color) {
                     setState(() {
-                      // Update the text as user types
+                      _textColor = color;
                     });
                   },
                 ),
-                // Example for changing font color, similar implementation can be done for font size and font family
-                ElevatedButton(
-                  onPressed: () {
-                    _showColorPicker();
-                  },
-                  child: const Text('Change Font Color'),
+                const SizedBox(
+                  height: 30,
                 ),
-                // Add sliders for font size and dropdown for font family selection
+                Slider(
+                  min: 14,
+                  max: 50,
+                  divisions: 86,
+                  value: _textSize,
+                  label: _textSize.round().toString(),
+                  onChanged: (value) {
+                    setState(() {
+                      _textSize = value;
+                    });
+                  },
+                )
               ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Done'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showColorPicker() {
-    // Open a dialog or modal bottom sheet to select color
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Choose a color'),
-          content: SingleChildScrollView(
-            child: BlockPicker(
-              pickerColor: _textColor, // Use current text color
-              onColorChanged: (color) {
-                setState(() {
-                  _textColor = color;
-                });
-              },
             ),
           ),
           actions: <Widget>[
@@ -286,6 +253,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // This position is already relative to its parent, so no need to adjust with globalToLocal.
     // However, make sure this position does not go negative by clamping it to 0 or above.
+
+
+    print("Dx :: ${_textPosition.dx} and Dy :: ${_textPosition.dy}");
+
     final double clampedX = max(0, _textPosition.dx);
     final double clampedY = max(0, _textPosition.dy);
 
@@ -310,12 +281,33 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (context) => PreviewScreen(
             imageBytes: webImage,
             config: configuration,
-            containerSize: 800,
+            containerWidth: 1000,
+            containerHeight: 800,
           ),
         ),
       );
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to copy configuration: $error')));
+    });
+  }
+
+  Widget aspectRatioButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: AspectRatioOption.values.map((aspectRatio) {
+        return ElevatedButton(
+          onPressed: () => _changeAspectRatio(aspectRatio),
+          child: Text(aspectRatio.name.replaceFirstMapped(RegExp(r'^.'), (match) => match.group(0)!.toUpperCase())),
+        );
+      }).toList(),
+    );
+  }
+
+  // Function to handle aspect ratio change
+  void _changeAspectRatio(AspectRatioOption newAspectRatio) {
+    setState(() {
+      _selectedAspectRatio = newAspectRatio;
+      _pickedImage = null; // Remove the image if aspect ratio changes after selection
     });
   }
 }
