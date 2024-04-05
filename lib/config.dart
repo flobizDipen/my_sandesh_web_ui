@@ -1,7 +1,8 @@
-import 'package:my_sandesh_web_ui/component/font_style_dialog.dart';
+import 'package:my_sandesh_web_ui/component/font_properties_dialog.dart';
 import 'package:my_sandesh_web_ui/final _config.dart';
 
 import 'business_name.dart';
+import 'component/text_element.dart';
 
 class Configuration {
   final double containerWidth;

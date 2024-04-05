@@ -2,19 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:my_sandesh_web_ui/block_picker.dart';
-
-class FontProperties {
-  bool isTextAdded = false;
-  Offset textPosition = const Offset(0, 0);
-  double textSize = 14.0;
-  Color textColor = Colors.white; // Default text color
-  String fontFamily = 'Roboto';
-  FontWeight fontWeight = FontWeight.normal;
-
-  Offset getTextPosition() {
-    return Offset(max(0, textPosition.dx), max(0, textPosition.dy));
-  }
-}
+import 'package:my_sandesh_web_ui/component/text_element.dart';
 
 void showTextOptionsDialog({
   required BuildContext context,
