@@ -45,10 +45,6 @@ class _MyHomePageState extends State<MyHomePage> {
   List<TextElement> textElements = [];
 
   Uint8List? _frameImage;
-  FontProperties businessNameFontProperty = FontProperties();
-  FontProperties phoneNumberFontProperty = FontProperties();
-  FontProperties addressFontProperty = FontProperties();
-  FontProperties taglineFontProperty = FontProperties();
   Logo? businessLogo = Logo();
 
   AspectRatioOption _selectedAspectRatio = AspectRatioOption.oneToOne;
@@ -65,25 +61,25 @@ class _MyHomePageState extends State<MyHomePage> {
       type: TextFieldType.companyName,
       buttonText: "Add Company Name",
       controller: TextEditingController(text: "Company Name"),
-      fontProperties: businessNameFontProperty,
+      fontProperties: FontProperties(),
     ));
     textElements.add(TextElement(
       type: TextFieldType.phoneNumber,
       buttonText: "Add Phone Number",
       controller: TextEditingController(text: "+919725955985"),
-      fontProperties: phoneNumberFontProperty,
+      fontProperties: FontProperties(),
     ));
     textElements.add(TextElement(
       type: TextFieldType.address,
       buttonText: "Add Address",
       controller: TextEditingController(text: "FloBiz, Bengaluru, Karnataka"),
-      fontProperties: addressFontProperty,
+      fontProperties: FontProperties(),
     ));
     textElements.add(TextElement(
       type: TextFieldType.tagline,
       buttonText: "Add Tagline",
       controller: TextEditingController(text: "Business Karneka Naya tareeka"),
-      fontProperties: taglineFontProperty,
+      fontProperties: FontProperties(),
     ));
     // Add other text elements as needed
   }
@@ -172,10 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final configuration = createConfiguration(
       containerWidth: containerRenderBox.size.width,
       containerHeight: containerRenderBox.size.height,
-      businessName: businessNameFontProperty,
-      phoneNumber: phoneNumberFontProperty,
-      address: addressFontProperty,
-      tagline: taglineFontProperty,
+      textElements: textElements,
       logo: businessLogo,
     );
 

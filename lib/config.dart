@@ -39,21 +39,16 @@ class Configuration {
 Configuration createConfiguration({
   required double containerWidth,
   required double containerHeight,
-  required FontProperties businessName,
-  required FontProperties phoneNumber,
-  required FontProperties address,
-  required FontProperties tagline,
+  required List<TextElement> textElements,
   required Logo? logo,
 }) {
   // Convert the fontColor to a hex string properly
 
 // Create a map to hold TextConfigs keyed by TextFieldType
-  Map<TextFieldType, TextConfig> textConfigs = {
-    TextFieldType.companyName: getTextConfig(containerWidth, containerHeight, businessName),
-    TextFieldType.phoneNumber: getTextConfig(containerWidth, containerHeight, phoneNumber),
-    TextFieldType.address: getTextConfig(containerWidth, containerHeight, address),
-    TextFieldType.tagline: getTextConfig(containerWidth, containerHeight, tagline),
-  };
+  Map<TextFieldType, TextConfig> textConfigs = textElements.fold<Map<TextFieldType, TextConfig>>({}, (map, element) {
+    map[element.type] = getTextConfig(containerWidth, containerHeight, element.fontProperties);
+    return map;
+  });
 
   LogoImageConfig? logoImageConfig;
   if (logo == null) {
