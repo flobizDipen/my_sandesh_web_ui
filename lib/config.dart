@@ -1,3 +1,4 @@
+import 'package:my_sandesh_web_ui/component/font_style_dialog.dart';
 import 'package:my_sandesh_web_ui/final _config.dart';
 
 import 'business_name.dart';
@@ -80,10 +81,10 @@ class Configuration {
 Configuration createConfiguration({
   required double containerWidth,
   required double containerHeight,
-  required FontSupport businessName,
-  required FontSupport phoneNumber,
-  required FontSupport address,
-  required FontSupport tagline,
+  required FontProperties businessName,
+  required FontProperties phoneNumber,
+  required FontProperties address,
+  required FontProperties tagline,
   required Logo? logo,
 }) {
   // Convert the fontColor to a hex string properly
@@ -113,7 +114,7 @@ Configuration createConfiguration({
 BusinessNameConfig getBusinessNameConfig(
   double containerWidth,
   double containerHeight,
-  FontSupport businessNameText,
+  FontProperties businessNameText,
 ) {
   String fontColorHex = '#${businessNameText.textColor.value.toRadixString(16).padLeft(8, '0')}';
 
@@ -136,7 +137,7 @@ BusinessNameConfig getBusinessNameConfig(
 PhoneNumberConfig getPhoneNumberConfig(
   double containerWidth,
   double containerHeight,
-  FontSupport phoneNumber,
+  FontProperties phoneNumber,
 ) {
   String fontColorHex = '#${phoneNumber.textColor.value.toRadixString(16).padLeft(8, '0')}';
 
@@ -159,7 +160,7 @@ PhoneNumberConfig getPhoneNumberConfig(
 AddressConfig getAddressConfig(
   double containerWidth,
   double containerHeight,
-  FontSupport phoneNumber,
+  FontProperties phoneNumber,
 ) {
   String fontColorHex = '#${phoneNumber.textColor.value.toRadixString(16).padLeft(8, '0')}';
 
@@ -182,7 +183,7 @@ AddressConfig getAddressConfig(
 TaglineConfig getTaglineConfig(
   double containerWidth,
   double containerHeight,
-  FontSupport phoneNumber,
+  FontProperties phoneNumber,
 ) {
   String fontColorHex = '#${phoneNumber.textColor.value.toRadixString(16).padLeft(8, '0')}';
 

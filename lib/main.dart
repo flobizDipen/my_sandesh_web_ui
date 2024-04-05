@@ -6,10 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
 import 'package:my_sandesh_web_ui/business_name.dart';
+import 'package:my_sandesh_web_ui/component/font_style_dialog.dart';
 import 'package:my_sandesh_web_ui/config.dart';
 import 'package:my_sandesh_web_ui/preview.dart';
-
-import 'block_picker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,10 +42,10 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey _containerKey = GlobalKey();
 
   Uint8List? _frameImage;
-  FontSupport businessName = FontSupport();
-  FontSupport phoneNumber = FontSupport();
-  FontSupport address = FontSupport();
-  FontSupport tagline = FontSupport();
+  FontProperties businessNameFontProperty = FontProperties();
+  FontProperties phoneNumberFontProperty = FontProperties();
+  FontProperties addressFontProperty = FontProperties();
+  FontProperties taglineFontProperty = FontProperties();
   Logo? businessLogo = Logo();
 
   final TextEditingController _companyNameController = TextEditingController(text: "Company Name");
@@ -83,10 +82,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 fit: BoxFit.fill,
                               ),
                       ),
-                      if (businessName.isTextAdded != false) _businessNameContainer(),
-                      if (phoneNumber.isTextAdded != false) _phoneNumberContainer(),
-                      if(address.isTextAdded != false) _addressContainer(),
-                      if(tagline.isTextAdded != false) _taglineContainer(),
+                      if (businessNameFontProperty.isTextAdded != false) _businessNameContainer(),
+                      if (phoneNumberFontProperty.isTextAdded != false) _phoneNumberContainer(),
+                      if (addressFontProperty.isTextAdded != false) _addressContainer(),
+                      if (taglineFontProperty.isTextAdded != false) _taglineContainer(),
                       if (businessLogo?.selectedLogo != null) _businessLogoContainer(),
                     ],
                   ),
@@ -135,119 +134,16 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _showTextOptionsDialog(
-    TextEditingController controller,
-    FontSupport fontStyle,
-    Function(String) onTextUpdate,
-    Function(FontWeight) onFontWeight,
-    Function(double) onTextSize,
-    Function(Color) onColorChange,
-    Function(String) onFontFamily,
-  ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          // Use StatefulBuilder to manage state inside the dialog
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Text Options'),
-              content: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    TextField(
-                      controller: controller,
-                      decoration: const InputDecoration(
-                        labelText: 'Input Text',
-                      ),
-                      onChanged: (value) {
-                        onTextUpdate(value);
-                      },
-                    ),
-                    const Divider(),
-                    BlockPicker(
-                      pickerColor: fontStyle.textColor, // Use current text color
-                      onColorChanged: (color) {
-                        setState(() {
-                          fontStyle.textColor = color;
-                        });
-                        onColorChange(color);
-                      },
-                    ),
-                    const Divider(),
-                    Slider(
-                      min: 14,
-                      max: 50,
-                      divisions: 36,
-                      value: fontStyle.textSize,
-                      label: fontStyle.textSize.round().toString(),
-                      onChanged: (value) {
-                        setState(() {
-                          fontStyle.textSize = value;
-                        });
-                        onTextSize(value);
-                      },
-                    ),
-                    const Divider(),
-                    DropdownButton<FontWeight>(
-                      value: fontStyle.fontWeight,
-                      items: FontWeight.values.map((FontWeight value) {
-                        return DropdownMenuItem<FontWeight>(
-                          value: value,
-                          child: Text(value.toString().split('.').last),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          fontStyle.fontWeight = value!;
-                        });
-                        onFontWeight(value!);
-                      },
-                    ),
-                    const Divider(),
-                    DropdownButton<String>(
-                      value: fontStyle.fontFamily,
-                      items: <String>['Roboto', 'Open Sans', 'Lato', 'Montserrat'].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          fontStyle.fontFamily = value!;
-                        });
-                        onFontFamily(value!);
-                      },
-                    )
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Done'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
   void generateConfig() {
     final RenderBox containerRenderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
 
     final configuration = createConfiguration(
       containerWidth: containerRenderBox.size.width,
       containerHeight: containerRenderBox.size.height,
-      businessName: businessName,
-      phoneNumber: phoneNumber,
-      address: address,
-      tagline: tagline,
+      businessName: businessNameFontProperty,
+      phoneNumber: phoneNumberFontProperty,
+      address: addressFontProperty,
+      tagline: taglineFontProperty,
       logo: businessLogo,
     );
 
@@ -387,17 +283,17 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Text(
         _companyNameController.text,
         style: TextStyle(
-          fontFamily: businessName.fontFamily,
-          fontSize: businessName.textSize,
-          color: businessName.textColor,
-          fontWeight: businessName.fontWeight,
+          fontFamily: businessNameFontProperty.fontFamily,
+          fontSize: businessNameFontProperty.textSize,
+          color: businessNameFontProperty.textColor,
+          fontWeight: businessNameFontProperty.fontWeight,
         ),
       ),
     );
 
     return Positioned(
-      left: businessName.textPosition.dx,
-      top: businessName.textPosition.dy,
+      left: businessNameFontProperty.textPosition.dx,
+      top: businessNameFontProperty.textPosition.dy,
       child: Draggable(
         feedback: Material(
           type: MaterialType.transparency,
@@ -412,13 +308,14 @@ class _MyHomePageState extends State<MyHomePage> {
           final RenderBox renderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
           final Offset localOffset = renderBox.globalToLocal(details.offset);
           setState(() {
-            businessName.textPosition = localOffset;
+            businessNameFontProperty.textPosition = localOffset;
           });
         },
         child: child,
       ),
     );
   }
+
   Widget _phoneNumberContainer() {
     Widget child = Container(
       decoration: BoxDecoration(
@@ -427,16 +324,16 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Text(
         _phoneNumberController.text,
         style: TextStyle(
-          fontFamily: phoneNumber.fontFamily,
-          fontSize: phoneNumber.textSize,
-          color: phoneNumber.textColor,
+          fontFamily: phoneNumberFontProperty.fontFamily,
+          fontSize: phoneNumberFontProperty.textSize,
+          color: phoneNumberFontProperty.textColor,
         ),
       ),
     );
 
     return Positioned(
-      left: phoneNumber.textPosition.dx,
-      top: phoneNumber.textPosition.dy,
+      left: phoneNumberFontProperty.textPosition.dx,
+      top: phoneNumberFontProperty.textPosition.dy,
       child: Draggable(
         feedback: Material(
           type: MaterialType.transparency,
@@ -451,7 +348,7 @@ class _MyHomePageState extends State<MyHomePage> {
           final RenderBox renderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
           final Offset localOffset = renderBox.globalToLocal(details.offset);
           setState(() {
-            phoneNumber.textPosition = localOffset;
+            phoneNumberFontProperty.textPosition = localOffset;
           });
         },
         child: child,
@@ -467,16 +364,16 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Text(
         _addressController.text,
         style: TextStyle(
-          fontFamily: address.fontFamily,
-          fontSize: address.textSize,
-          color: address.textColor,
+          fontFamily: addressFontProperty.fontFamily,
+          fontSize: addressFontProperty.textSize,
+          color: addressFontProperty.textColor,
         ),
       ),
     );
 
     return Positioned(
-      left: address.textPosition.dx,
-      top: address.textPosition.dy,
+      left: addressFontProperty.textPosition.dx,
+      top: addressFontProperty.textPosition.dy,
       child: Draggable(
         feedback: Material(
           type: MaterialType.transparency,
@@ -491,13 +388,14 @@ class _MyHomePageState extends State<MyHomePage> {
           final RenderBox renderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
           final Offset localOffset = renderBox.globalToLocal(details.offset);
           setState(() {
-            address.textPosition = localOffset;
+            addressFontProperty.textPosition = localOffset;
           });
         },
         child: child,
       ),
     );
   }
+
   Widget _taglineContainer() {
     Widget child = Container(
       decoration: BoxDecoration(
@@ -506,16 +404,16 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Text(
         _taglineController.text,
         style: TextStyle(
-          fontFamily: tagline.fontFamily,
-          fontSize: tagline.textSize,
-          color: tagline.textColor,
+          fontFamily: taglineFontProperty.fontFamily,
+          fontSize: taglineFontProperty.textSize,
+          color: taglineFontProperty.textColor,
         ),
       ),
     );
 
     return Positioned(
-      left: tagline.textPosition.dx,
-      top: tagline.textPosition.dy,
+      left: taglineFontProperty.textPosition.dx,
+      top: taglineFontProperty.textPosition.dy,
       child: Draggable(
         feedback: Material(
           type: MaterialType.transparency,
@@ -530,7 +428,7 @@ class _MyHomePageState extends State<MyHomePage> {
           final RenderBox renderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
           final Offset localOffset = renderBox.globalToLocal(details.offset);
           setState(() {
-            tagline.textPosition = localOffset;
+            taglineFontProperty.textPosition = localOffset;
           });
         },
         child: child,
@@ -542,32 +440,33 @@ class _MyHomePageState extends State<MyHomePage> {
     return ElevatedButton(
         onPressed: () {
           setState(() {
-            businessName.isTextAdded = true;
+            businessNameFontProperty.isTextAdded = true;
           });
-          _showTextOptionsDialog(
-            _companyNameController,
-            businessName,
-            (String textChange) {
+          showTextOptionsDialog(
+            context: context,
+            controller: _companyNameController,
+            fontStyle: businessNameFontProperty,
+            onTextUpdate: (String textChange) {
               setState(() {});
             },
-            (FontWeight fontWeight) {
+            onFontWeight: (FontWeight fontWeight) {
               setState(() {
-                businessName.fontWeight = fontWeight;
+                businessNameFontProperty.fontWeight = fontWeight;
               });
             },
-            (double fontSize) {
+            onTextSize: (double fontSize) {
               setState(() {
-                businessName.textSize = fontSize;
+                businessNameFontProperty.textSize = fontSize;
               });
             },
-            (Color fontColor) {
+            onColorChange: (Color fontColor) {
               setState(() {
-                businessName.textColor = fontColor;
+                businessNameFontProperty.textColor = fontColor;
               });
             },
-            (String fontFamily) {
+            onFontFamily: (String fontFamily) {
               setState(() {
-                businessName.fontFamily = fontFamily;
+                businessNameFontProperty.fontFamily = fontFamily;
               });
             },
           );
@@ -579,32 +478,33 @@ class _MyHomePageState extends State<MyHomePage> {
     return ElevatedButton(
         onPressed: () {
           setState(() {
-            phoneNumber.isTextAdded = true;
+            phoneNumberFontProperty.isTextAdded = true;
           });
-          _showTextOptionsDialog(
-            _phoneNumberController,
-            phoneNumber,
-            (String textChange) {
+          showTextOptionsDialog(
+            context: context,
+            controller: _phoneNumberController,
+            fontStyle: phoneNumberFontProperty,
+            onTextUpdate: (String textChange) {
               setState(() {});
             },
-            (FontWeight fontWeight) {
+            onFontWeight: (FontWeight fontWeight) {
               setState(() {
-                phoneNumber.fontWeight = fontWeight;
+                phoneNumberFontProperty.fontWeight = fontWeight;
               });
             },
-            (double fontSize) {
+            onTextSize: (double fontSize) {
               setState(() {
-                phoneNumber.textSize = fontSize;
+                phoneNumberFontProperty.textSize = fontSize;
               });
             },
-            (Color fontColor) {
+            onColorChange: (Color fontColor) {
               setState(() {
-                phoneNumber.textColor = fontColor;
+                phoneNumberFontProperty.textColor = fontColor;
               });
             },
-            (String fontFamily) {
+            onFontFamily: (String fontFamily) {
               setState(() {
-                phoneNumber.fontFamily = fontFamily;
+                phoneNumberFontProperty.fontFamily = fontFamily;
               });
             },
           );
@@ -616,32 +516,33 @@ class _MyHomePageState extends State<MyHomePage> {
     return ElevatedButton(
         onPressed: () {
           setState(() {
-            address.isTextAdded = true;
+            addressFontProperty.isTextAdded = true;
           });
-          _showTextOptionsDialog(
-            _addressController,
-            address,
-                (String textChange) {
+          showTextOptionsDialog(
+            context: context,
+            controller: _addressController,
+            fontStyle: addressFontProperty,
+            onTextUpdate: (String textChange) {
               setState(() {});
             },
-                (FontWeight fontWeight) {
+            onFontWeight: (FontWeight fontWeight) {
               setState(() {
-                address.fontWeight = fontWeight;
+                addressFontProperty.fontWeight = fontWeight;
               });
             },
-                (double fontSize) {
+            onTextSize: (double fontSize) {
               setState(() {
-                address.textSize = fontSize;
+                addressFontProperty.textSize = fontSize;
               });
             },
-                (Color fontColor) {
+            onColorChange: (Color fontColor) {
               setState(() {
-                address.textColor = fontColor;
+                addressFontProperty.textColor = fontColor;
               });
             },
-                (String fontFamily) {
+            onFontFamily: (String fontFamily) {
               setState(() {
-                address.fontFamily = fontFamily;
+                addressFontProperty.fontFamily = fontFamily;
               });
             },
           );
@@ -653,32 +554,33 @@ class _MyHomePageState extends State<MyHomePage> {
     return ElevatedButton(
         onPressed: () {
           setState(() {
-            tagline.isTextAdded = true;
+            taglineFontProperty.isTextAdded = true;
           });
-          _showTextOptionsDialog(
-            _taglineController,
-            tagline,
-                (String textChange) {
+          showTextOptionsDialog(
+            context: context,
+            controller: _taglineController,
+            fontStyle: taglineFontProperty,
+            onTextUpdate: (String textChange) {
               setState(() {});
             },
-                (FontWeight fontWeight) {
+            onFontWeight: (FontWeight fontWeight) {
               setState(() {
-                tagline.fontWeight = fontWeight;
+                taglineFontProperty.fontWeight = fontWeight;
               });
             },
-                (double fontSize) {
+            onTextSize: (double fontSize) {
               setState(() {
-                tagline.textSize = fontSize;
+                taglineFontProperty.textSize = fontSize;
               });
             },
-                (Color fontColor) {
+            onColorChange: (Color fontColor) {
               setState(() {
-                tagline.textColor = fontColor;
+                taglineFontProperty.textColor = fontColor;
               });
             },
-                (String fontFamily) {
+            onFontFamily: (String fontFamily) {
               setState(() {
-                tagline.fontFamily = fontFamily;
+                taglineFontProperty.fontFamily = fontFamily;
               });
             },
           );
