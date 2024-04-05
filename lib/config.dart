@@ -1,13 +1,13 @@
 import 'package:my_sandesh_web_ui/component/text_field_type.dart';
 import 'package:my_sandesh_web_ui/final _config.dart';
 
-import 'business_name.dart';
+import 'logo_image.dart';
 import 'component/text_element.dart';
 
 class Configuration {
   final double containerWidth;
   final double containerHeight;
-  final Map<TextFieldType, TextConfig> textConfigs;
+  final Map<TextFieldType, TextConfig?> textConfigs;
   final LogoImageConfig? logoImageConfig;
 
   Configuration(
@@ -20,13 +20,11 @@ class Configuration {
     Map<String, dynamic> elementsJson = {};
 
     textConfigs.forEach((type, config) {
-      elementsJson[type.toString()] = config.toJson();
+      elementsJson[type.name.toString()] = config?.toJson();
     });
 
     // Add logo configuration if exists
-    if (logoImageConfig != null) {
-      elementsJson['logoImage'] = logoImageConfig?.toJson();
-    }
+    elementsJson['logoImage'] = logoImageConfig?.toJson();
 
     return {
       "containerWidth": containerWidth,
@@ -40,15 +38,20 @@ Configuration createConfiguration({
   required double containerWidth,
   required double containerHeight,
   required List<TextElement> textElements,
-  required Logo? logo,
+  required LogoImage? logo,
 }) {
-  // Convert the fontColor to a hex string properly
 
-// Create a map to hold TextConfigs keyed by TextFieldType
-  Map<TextFieldType, TextConfig> textConfigs = textElements.fold<Map<TextFieldType, TextConfig>>({}, (map, element) {
-    map[element.type] = getTextConfig(containerWidth, containerHeight, element.fontProperties);
-    return map;
-  });
+  Map<TextFieldType, TextConfig?> textConfigs = {};
+  for (var element in textElements) {
+    // Check if the text element is added before generating its config
+    if (element.isAdded) {
+      textConfigs[element.type] = getTextConfig(containerWidth, containerHeight, element.fontProperties);
+    } else {
+      // If not added, you can choose to not include it in the map or explicitly set it to null
+      // This decision depends on how you plan to use these configurations later
+      textConfigs[element.type] = null;
+    }
+  }
 
   LogoImageConfig? logoImageConfig;
   if (logo == null) {
@@ -100,7 +103,7 @@ TextConfig getTextConfig(
 LogoImageConfig getLogoImageConfig(
   double containerWidth,
   double containerHeight,
-  Logo logoImage,
+  LogoImage logoImage,
 ) {
   final imagePosition = logoImage.getImagePosition();
 

@@ -29,8 +29,8 @@ class LogoImageConfig {
   LogoImageConfig({required this.logoPosition, required this.logoSize});
 
   Map<String, dynamic> toJson() => {
-        'logoSize': logoSize.toJson(),
-        'logoPosition': logoPosition.toJson(), // Assuming Position also has a .toJson()
+        'size': logoSize.toJson(),
+        'position': logoPosition.toJson(), // Assuming Position also has a .toJson()
       };
 }
 

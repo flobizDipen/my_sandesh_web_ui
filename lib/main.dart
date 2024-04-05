@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
-import 'package:my_sandesh_web_ui/business_name.dart';
+import 'package:my_sandesh_web_ui/logo_image.dart';
 import 'package:my_sandesh_web_ui/component/font_properties_dialog.dart';
 import 'package:my_sandesh_web_ui/component/text_element.dart';
 import 'package:my_sandesh_web_ui/component/text_field_type.dart';
 import 'package:my_sandesh_web_ui/config.dart';
 import 'package:my_sandesh_web_ui/preview.dart';
+import 'package:my_sandesh_web_ui/utility/widget_extension.dart';
 
 void main() {
   runApp(const MyApp());
@@ -45,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<TextElement> textElements = [];
 
   Uint8List? _frameImage;
-  Logo? businessLogo = Logo();
+  LogoImage? businessLogo;
 
   AspectRatioOption _selectedAspectRatio = AspectRatioOption.oneToOne;
 
@@ -95,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: Column(
               children: [
-                divider(),
+                context.divider(),
                 SizedBox(
                   width: _selectedAspectRatio.size.width,
                   height: _selectedAspectRatio.size.height,
@@ -149,9 +150,9 @@ class _MyHomePageState extends State<MyHomePage> {
       final ImagePicker _picker = ImagePicker();
       XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
-        var f = await image.readAsBytes();
+        var logoBytes = await image.readAsBytes();
         setState(() {
-          businessLogo?.selectedLogo = f;
+          businessLogo = LogoImage()..selectedLogo = logoBytes;
           businessLogo?.imageSize = const Size(100, 100);
         });
       } else {
@@ -227,22 +228,22 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           aspectRatioButtons(),
-          divider(),
+          context.divider(),
           ElevatedButton(
               onPressed: () {
                 _pickImage();
               },
               child: const Text("Upload Frame")),
-          divider(),
+          context.divider(),
           _textElementButton(),
-          divider(),
+          context.divider(),
           ElevatedButton(
             onPressed: () {
               _pickLogoImage();
             },
             child: const Text("Add Image"),
           ),
-          divider(),
+          context.divider(),
           ElevatedButton(
               onPressed: () {
                 generateConfig();
@@ -252,14 +253,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-  Widget divider() => const SizedBox(
-        height: 30,
-      );
-
-  Widget dividerWidth() => const SizedBox(
-        width: 30,
-      );
 
   Widget _businessLogoContainer() {
     if (businessLogo != null) {

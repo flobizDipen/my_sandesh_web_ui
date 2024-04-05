@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
-import 'package:my_sandesh_web_ui/component/text_field_type.dart';
 import 'package:my_sandesh_web_ui/config.dart';
 import 'package:my_sandesh_web_ui/final _config.dart';
 
@@ -60,10 +59,8 @@ class PreviewScreen extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              _businessName(containerWidth, containerHeight, config.textConfigs[TextFieldType.companyName]!),
-              _phoneNumber(containerWidth, containerHeight, config.textConfigs[TextFieldType.phoneNumber]!),
-              _address(containerWidth, containerHeight, config.textConfigs[TextFieldType.address]!),
-              _tagline(containerWidth, containerHeight, config.textConfigs[TextFieldType.tagline]!),
+              ..._buildDynamicTextWidgets(
+                  containerWidth: containerWidth, containerHeight: containerHeight, config: config),
               if (image != null && config.logoImageConfig != null)
                 _logoImage(containerWidth, containerHeight, config.logoImageConfig)
             ],
@@ -73,50 +70,40 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _businessName(double containerWidth, double containerHeight, TextConfig config) {
-    // Calculations are now fully dynamic based on configuration percentages
-    double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth; // fontSizePercentage is a percentage
-    double leftPosition =
-        config.textPosition.leftMargin * 0.01 * containerWidth; // Adjust according to margin percentages
-    double topPosition = config.textPosition.topMargin * 0.01 * containerHeight;
-
-    // Handle potential hex color format issues (ensure your config.fontColor includes alpha if needed)
-    final Color fontColor = Color(int.parse(config.fontColor.substring(1), radix: 16) | 0xFF000000);
-
-    return Positioned(
-      left: leftPosition, // Ensure the text remains within bounds
-      top: topPosition,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.red),
-        ),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            "Mayank & Sons",
-            style: TextStyle(
-                fontSize: scaledFontSize,
-                color: fontColor,
-                fontFamily: config.fontName,
-                fontWeight: stringToFontWeight(config.fontWeight)),
-          ),
-        ),
-      ),
-    );
+  List<Widget> _buildDynamicTextWidgets({
+    required double containerWidth,
+    required double containerHeight,
+    required Configuration config,
+  }) {
+    // Assuming 'config.textConfigs' is a Map<TextFieldType, TextConfig?>
+    // This will filter out any null configurations and map each remaining config to a widget
+    return config.textConfigs.entries
+        .where((entry) => entry.value != null) // Ensure config is not null
+        .map<Widget>((entry) {
+      TextConfig config = entry.value!;
+      String textContent = entry.key.labelName; // Assuming TextFieldType has a labelName property
+      return _buildTextWidget(
+        containerWidth: containerWidth,
+        containerHeight: containerHeight,
+        config: config,
+        textContent: textContent,
+      );
+    }).toList();
   }
 
-  Widget _phoneNumber(double containerWidth, double containerHeight, TextConfig config) {
-    // Calculations are now fully dynamic based on configuration percentages
-    double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth; // fontSizePercentage is a percentage
-    double leftPosition =
-        config.textPosition.leftMargin * 0.01 * containerWidth; // Adjust according to margin percentages
+  Widget _buildTextWidget({
+    required double containerWidth,
+    required double containerHeight,
+    required TextConfig config,
+    required String textContent,
+  }) {
+    double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth;
+    double leftPosition = config.textPosition.leftMargin * 0.01 * containerWidth;
     double topPosition = config.textPosition.topMargin * 0.01 * containerHeight;
-
-    // Handle potential hex color format issues (ensure your config.fontColor includes alpha if needed)
     final Color fontColor = Color(int.parse(config.fontColor.substring(1), radix: 16) | 0xFF000000);
 
     return Positioned(
-      left: leftPosition, // Ensure the text remains within bounds
+      left: leftPosition,
       top: topPosition,
       child: Container(
         decoration: BoxDecoration(
@@ -125,76 +112,13 @@ class PreviewScreen extends StatelessWidget {
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            "+919725955985",
+            textContent,
             style: TextStyle(
-                fontSize: scaledFontSize,
-                color: fontColor,
-                fontFamily: config.fontName,
-                fontWeight: stringToFontWeight(config.fontWeight)),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _address(double containerWidth, double containerHeight, TextConfig config) {
-    // Calculations are now fully dynamic based on configuration percentages
-    double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth; // fontSizePercentage is a percentage
-    double leftPosition =
-        config.textPosition.leftMargin * 0.01 * containerWidth; // Adjust according to margin percentages
-    double topPosition = config.textPosition.topMargin * 0.01 * containerHeight;
-
-    // Handle potential hex color format issues (ensure your config.fontColor includes alpha if needed)
-    final Color fontColor = Color(int.parse(config.fontColor.substring(1), radix: 16) | 0xFF000000);
-
-    return Positioned(
-      left: leftPosition, // Ensure the text remains within bounds
-      top: topPosition,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.red),
-        ),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            "INDIA",
-            style: TextStyle(
-                fontSize: scaledFontSize,
-                color: fontColor,
-                fontFamily: config.fontName,
-                fontWeight: stringToFontWeight(config.fontWeight)),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _tagline(double containerWidth, double containerHeight, TextConfig config) {
-    // Calculations are now fully dynamic based on configuration percentages
-    double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth; // fontSizePercentage is a percentage
-    double leftPosition =
-        config.textPosition.leftMargin * 0.01 * containerWidth; // Adjust according to margin percentages
-    double topPosition = config.textPosition.topMargin * 0.01 * containerHeight;
-
-    // Handle potential hex color format issues (ensure your config.fontColor includes alpha if needed)
-    final Color fontColor = Color(int.parse(config.fontColor.substring(1), radix: 16) | 0xFF000000);
-
-    return Positioned(
-      left: leftPosition, // Ensure the text remains within bounds
-      top: topPosition,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.red),
-        ),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            "Yaha se sasta kahi nahi",
-            style: TextStyle(
-                fontSize: scaledFontSize,
-                color: fontColor,
-                fontFamily: config.fontName,
-                fontWeight: stringToFontWeight(config.fontWeight)),
+              fontSize: scaledFontSize,
+              color: fontColor,
+              fontFamily: config.fontName,
+              fontWeight: stringToFontWeight(config.fontWeight),
+            ),
           ),
         ),
       ),

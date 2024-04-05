@@ -9,7 +9,6 @@ class FontProperties {
   Color textColor;
   String fontFamily;
   Offset textPosition;
-  bool isTextAdded;
 
   FontProperties({
     this.textSize = 14.0,
@@ -17,7 +16,6 @@ class FontProperties {
     this.textColor = Colors.black,
     this.fontFamily = 'Roboto',
     this.textPosition = const Offset(0, 0),
-    this.isTextAdded = false,
   });
 
   Offset getTextPosition() {

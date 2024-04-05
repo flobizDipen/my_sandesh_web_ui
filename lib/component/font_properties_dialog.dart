@@ -46,9 +46,9 @@ void showTextOptionsDialog({
                   ),
                   const Divider(),
                   Slider(
-                    min: 14,
+                    min: 8,
                     max: 50,
-                    divisions: 36,
+                    divisions: 42,
                     value: fontStyle.textSize,
                     label: fontStyle.textSize.round().toString(),
                     onChanged: (value) {
