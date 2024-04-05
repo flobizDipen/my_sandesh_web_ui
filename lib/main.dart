@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'mySandesh UI Builder',
+      title: 'mySandesh Frame Builder',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
@@ -44,19 +42,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey _containerKey = GlobalKey();
 
-  File? _pickedFrame;
-  Uint8List webFrame = Uint8List(8);
-
-  File? _pickedLogo;
-  Uint8List logoImage = Uint8List(8);
-
+  Uint8List? _frameImage;
   BusinessName businessNameText = BusinessName();
-  Logo businessLogo = Logo(imagePosition: const Offset(0, 0), imageSize: const Size(100, 100));
+  Logo? businessLogo = Logo();
 
   final TextEditingController _companyNameController = TextEditingController(text: "Company Name");
 
   AspectRatioOption _selectedAspectRatio = AspectRatioOption.oneToOne;
-
 
   @override
   Widget build(BuildContext context) {
@@ -84,17 +76,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         Container(
                           key: _containerKey,
                           color: Colors.blueGrey,
-                          child: _pickedFrame == null
+                          child: _frameImage == null
                               ? null
                               : Image.memory(
-                            webFrame,
-                            fit: BoxFit.fill,
-                          ),
+                                  _frameImage!,
+                                  fit: BoxFit.fill,
+                                ),
                         ),
-                        if (businessNameText.isTextAdded != false)
-                          _businessNameContainer(),
-                        if (_pickedLogo != null)
-                          _businessLogoContainer(),
+                        if (businessNameText.isTextAdded != false) _businessNameContainer(),
+                        if (businessLogo?.selectedLogo != null) _businessLogoContainer(),
                       ],
                     ),
                   ),
@@ -114,8 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (image != null) {
         var f = await image.readAsBytes();
         setState(() {
-          webFrame = f;
-          _pickedFrame = File('a');
+          _frameImage = f;
         });
       } else {
         print("No Image has been picked");
@@ -133,9 +122,8 @@ class _MyHomePageState extends State<MyHomePage> {
       if (image != null) {
         var f = await image.readAsBytes();
         setState(() {
-          logoImage = f;
-          businessLogo.imageSize = const Size(100, 100);
-          _pickedLogo = File('a');
+          businessLogo?.selectedLogo = f;
+          businessLogo?.imageSize = const Size(100, 100);
         });
       } else {
         print("No Image has been picked");
@@ -217,14 +205,13 @@ class _MyHomePageState extends State<MyHomePage> {
     Clipboard.setData(ClipboardData(text: jsonConfig)).then((_) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) =>
-              PreviewScreen(
-                frame: webFrame,
-                image: logoImage,
-                config: configuration,
-                containerWidth: 1000,
-                containerHeight: 800,
-              ),
+          builder: (context) => PreviewScreen(
+            frame: _frameImage!,
+            image: businessLogo?.selectedLogo,
+            config: configuration,
+            containerWidth: 1000,
+            containerHeight: 800,
+          ),
         ),
       );
     }).catchError((error) {
@@ -235,8 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget aspectRatioButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children:
-      AspectRatioOption.values.map((aspectRatio) {
+      children: AspectRatioOption.values.map((aspectRatio) {
         return Padding(
           padding: const EdgeInsets.only(right: 14),
           child: ElevatedButton(
@@ -252,7 +238,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _changeAspectRatio(AspectRatioOption newAspectRatio) {
     setState(() {
       _selectedAspectRatio = newAspectRatio;
-      _pickedFrame = null; // Remove the image if aspect ratio changes after selection
+      _frameImage = null; // Remove the image if aspect ratio changes after selection
     });
   }
 
@@ -323,37 +309,44 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget divider() => const SizedBox(height: 30,);
+  Widget divider() => const SizedBox(
+        height: 30,
+      );
 
-  Widget dividerWidth() => const SizedBox(width: 30,);
+  Widget dividerWidth() => const SizedBox(
+        width: 30,
+      );
 
   Widget _businessLogoContainer() {
-    var memoryImage =
-        Image.memory(logoImage, width: businessLogo.imageSize.width, height: businessLogo.imageSize.height);
+    if (businessLogo != null) {
+      var memoryImage = Image.memory(businessLogo!.selectedLogo!,
+          width: businessLogo?.imageSize.width, height: businessLogo?.imageSize.height);
 
-    return Positioned(
-      left: businessLogo.imagePosition.dx,
-      top: businessLogo.imagePosition.dy,
-      child: Draggable(
-        feedback: Material(
-          type: MaterialType.transparency,
+      return Positioned(
+        left: businessLogo?.imagePosition.dx,
+        top: businessLogo?.imagePosition.dy,
+        child: Draggable(
+          feedback: Material(
+            type: MaterialType.transparency,
+            child: memoryImage,
+          ),
+          childWhenDragging: Opacity(
+            opacity: 0.5,
+            child: memoryImage,
+          ),
+          onDragEnd: (details) {
+            // Calculate the new position relative to the container
+            final RenderBox renderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
+            final Offset localOffset = renderBox.globalToLocal(details.offset);
+            setState(() {
+              businessLogo?.imagePosition = localOffset;
+            });
+          },
           child: memoryImage,
         ),
-        childWhenDragging: Opacity(
-          opacity: 0.5,
-          child: memoryImage,
-        ),
-        onDragEnd: (details) {
-          // Calculate the new position relative to the container
-          final RenderBox renderBox =
-          _containerKey.currentContext!.findRenderObject() as RenderBox;
-          final Offset localOffset = renderBox.globalToLocal(details.offset);
-          setState(() {
-            businessLogo.imagePosition = localOffset;
-          });
-        },
-        child: memoryImage,
-      ),
-    );
+      );
+    } else {
+      return Container();
+    }
   }
 }

@@ -5,7 +5,7 @@ import 'package:my_sandesh_web_ui/final _config.dart';
 
 class PreviewScreen extends StatelessWidget {
   final Uint8List frame;
-  final Uint8List image;
+  final Uint8List? image;
   final Configuration config;
   final double containerWidth;
   final double containerHeight;
@@ -37,7 +37,10 @@ class PreviewScreen extends StatelessWidget {
             ),
           ),
           child: Stack(
-            children: [_businessName(config.businessNameConfig), _logoImage(config.logoImageConfig)],
+            children: [
+              _businessName(config.businessNameConfig),
+              if (image != null && config.logoImageConfig != null) _logoImage(config.logoImageConfig)
+            ],
           ),
         ),
       ),
@@ -77,19 +80,19 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _logoImage(LogoImageConfig logoImageConfig) {
-    double imageLeftPosition = logoImageConfig.logoPosition.leftMargin * 0.01 * containerWidth;
-    double imageTopPosition = logoImageConfig.logoPosition.topMargin * 0.01 * containerHeight;
+  Widget _logoImage(LogoImageConfig? logoImageConfig) {
+    double imageLeftPosition = (logoImageConfig?.logoPosition.leftMargin ?? 0) * 0.01 * containerWidth;
+    double imageTopPosition = (logoImageConfig?.logoPosition.topMargin ?? 0) * 0.01 * containerHeight;
 
-    final double additionalImageWidth = logoImageConfig.logoSize.width * containerWidth / 100;
-    final double additionalImageHeight = logoImageConfig.logoSize.height * containerHeight / 100;
+    final double additionalImageWidth = (logoImageConfig?.logoSize.width ?? 0) * containerWidth / 100;
+    final double additionalImageHeight = (logoImageConfig?.logoSize.height ?? 0) * containerHeight / 100;
 
     return Positioned(
       left: imageLeftPosition,
       top: imageTopPosition,
       child: Image.memory(
         // You'll need to pass the Uint8List for the additional image into the PreviewScreen
-        image,
+        image!,
         width: additionalImageWidth, // or use config data if dynamic
         height: additionalImageHeight,
       ),

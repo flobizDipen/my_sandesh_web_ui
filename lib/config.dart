@@ -7,7 +7,7 @@ class Configuration {
   final double containerHeight;
 
   final BusinessNameConfig businessNameConfig;
-  final LogoImageConfig logoImageConfig;
+  final LogoImageConfig? logoImageConfig;
 
   Configuration(
       {required this.containerWidth,
@@ -29,12 +29,15 @@ class Configuration {
             "left": businessNameConfig.textPosition.leftMargin,
           }
         },
-        "additionalImage": {
+        "logoImage": {
           "position": {
-            "left": logoImageConfig.logoPosition.leftMargin,
-            "top": logoImageConfig.logoPosition.topMargin,
+            "left": logoImageConfig?.logoPosition.leftMargin,
+            "top": logoImageConfig?.logoPosition.topMargin,
           },
-          "size": {"width": logoImageConfig.logoSize.width, "height": logoImageConfig.logoSize.height},
+          "size": {
+            "width": logoImageConfig?.logoSize.width,
+            "height": logoImageConfig?.logoSize.height
+          },
         }
       }
     };
@@ -45,12 +48,17 @@ Configuration createConfiguration({
   required double containerWidth,
   required double containerHeight,
   required BusinessName businessName,
-  required Logo logo,
+  required Logo? logo,
 }) {
   // Convert the fontColor to a hex string properly
 
   final businessNameConfig = getBusinessNameConfig(containerWidth, containerHeight, businessName);
-  final logoImageConfig = getLogoImageConfig(containerWidth, containerHeight, logo);
+  LogoImageConfig? logoImageConfig;
+  if (logo == null) {
+    logoImageConfig = null;
+  } else {
+    logoImageConfig = getLogoImageConfig(containerWidth, containerHeight, logo);
+  }
 
   return Configuration(
       containerWidth: containerWidth,
