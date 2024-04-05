@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:my_sandesh_web_ui/component/text_field_type.dart';
 
 class FontProperties {
   double textSize;
@@ -25,12 +26,14 @@ class FontProperties {
 }
 
 class TextElement {
+  TextFieldType type;
   String buttonText;
   TextEditingController controller;
   FontProperties fontProperties;
   bool isAdded;
 
   TextElement({
+    required this.type,
     required this.buttonText,
     required this.controller,
     required this.fontProperties,

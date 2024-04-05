@@ -1,65 +1,25 @@
-class BusinessNameConfig {
+class TextConfig {
   final String fontWeight;
   final String fontName;
   final double fontSizePercentage;
   final String fontColor;
   final Position textPosition;
 
-  BusinessNameConfig({
+  TextConfig({
     required this.fontWeight,
     required this.fontName,
     required this.fontSizePercentage,
     required this.fontColor,
     required this.textPosition,
   });
-}
 
-class PhoneNumberConfig {
-  final String fontWeight;
-  final String fontName;
-  final double fontSizePercentage;
-  final String fontColor;
-  final Position textPosition;
-
-  PhoneNumberConfig({
-    required this.fontWeight,
-    required this.fontName,
-    required this.fontSizePercentage,
-    required this.fontColor,
-    required this.textPosition,
-  });
-}
-
-class AddressConfig {
-  final String fontWeight;
-  final String fontName;
-  final double fontSizePercentage;
-  final String fontColor;
-  final Position textPosition;
-
-  AddressConfig({
-    required this.fontWeight,
-    required this.fontName,
-    required this.fontSizePercentage,
-    required this.fontColor,
-    required this.textPosition,
-  });
-}
-
-class TaglineConfig {
-  final String fontWeight;
-  final String fontName;
-  final double fontSizePercentage;
-  final String fontColor;
-  final Position textPosition;
-
-  TaglineConfig({
-    required this.fontWeight,
-    required this.fontName,
-    required this.fontSizePercentage,
-    required this.fontColor,
-    required this.textPosition,
-  });
+  Map<String, dynamic> toJson() => {
+        'fontWeight': fontWeight,
+        'fontName': fontName,
+        'fontSizePercentage': fontSizePercentage,
+        'fontColor': fontColor,
+        'textPosition': textPosition.toJson(), // Assuming Position also has a .toJson()
+      };
 }
 
 class LogoImageConfig {
@@ -67,6 +27,11 @@ class LogoImageConfig {
   final Size logoSize;
 
   LogoImageConfig({required this.logoPosition, required this.logoSize});
+
+  Map<String, dynamic> toJson() => {
+        'logoSize': logoSize.toJson(),
+        'logoPosition': logoPosition.toJson(), // Assuming Position also has a .toJson()
+      };
 }
 
 class Position {
@@ -74,6 +39,11 @@ class Position {
   final double leftMargin;
 
   Position({required this.topMargin, required this.leftMargin});
+
+  Map<String, dynamic> toJson() => {
+        'topMargin': topMargin,
+        'leftMargin': leftMargin,
+      };
 }
 
 class Size {
@@ -81,4 +51,9 @@ class Size {
   final double height;
 
   Size({required this.width, required this.height});
+
+  Map<String, dynamic> toJson() => {
+        'width': width,
+        'height': height,
+      };
 }

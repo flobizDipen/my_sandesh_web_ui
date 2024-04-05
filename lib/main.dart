@@ -8,6 +8,7 @@ import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
 import 'package:my_sandesh_web_ui/business_name.dart';
 import 'package:my_sandesh_web_ui/component/font_properties_dialog.dart';
 import 'package:my_sandesh_web_ui/component/text_element.dart';
+import 'package:my_sandesh_web_ui/component/text_field_type.dart';
 import 'package:my_sandesh_web_ui/config.dart';
 import 'package:my_sandesh_web_ui/preview.dart';
 
@@ -61,21 +62,25 @@ class _MyHomePageState extends State<MyHomePage> {
   void _initializeTextElements() {
     // Initialize your text elements with default values or from a data source
     textElements.add(TextElement(
+      type: TextFieldType.companyName,
       buttonText: "Add Company Name",
       controller: TextEditingController(text: "Company Name"),
       fontProperties: businessNameFontProperty,
     ));
     textElements.add(TextElement(
+      type: TextFieldType.phoneNumber,
       buttonText: "Add Phone Number",
       controller: TextEditingController(text: "+919725955985"),
       fontProperties: phoneNumberFontProperty,
     ));
     textElements.add(TextElement(
+      type: TextFieldType.address,
       buttonText: "Add Address",
       controller: TextEditingController(text: "FloBiz, Bengaluru, Karnataka"),
       fontProperties: addressFontProperty,
     ));
     textElements.add(TextElement(
+      type: TextFieldType.tagline,
       buttonText: "Add Tagline",
       controller: TextEditingController(text: "Business Karneka Naya tareeka"),
       fontProperties: taglineFontProperty,
@@ -377,7 +382,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _textElementButton() {
     // Example for Company Name, repeat for others as needed
-    return Padding(
+    return Container(
       padding: const EdgeInsets.symmetric(vertical: 30),
       child: Column(
         children: textElements.map((element) {

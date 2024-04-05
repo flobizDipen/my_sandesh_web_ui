@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
+import 'package:my_sandesh_web_ui/component/text_field_type.dart';
 import 'package:my_sandesh_web_ui/config.dart';
 import 'package:my_sandesh_web_ui/final _config.dart';
 
@@ -29,18 +30,18 @@ class PreviewScreen extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _previewSmall(smallSize.width, smallSize.height),
+            _preview(smallSize.width, smallSize.height),
             const SizedBox(
               width: 30,
             ),
-            _previewLarge(largeSize.width, largeSize.height)
+            _preview(largeSize.width, largeSize.height)
           ],
         ),
       ),
     );
   }
 
-  Widget _previewSmall(double containerWidth, double containerHeight) {
+  Widget _preview(double containerWidth, double containerHeight) {
     return Column(
       children: [
         Text('Preview $containerWidth x $containerHeight'),
@@ -59,10 +60,10 @@ class PreviewScreen extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              _businessName(containerWidth, containerHeight, config.businessNameConfig),
-              _phoneNumber(containerWidth, containerHeight, config.phoneNumberConfig),
-              _address(containerWidth, containerHeight, config.addressConfig),
-              _tagline(containerWidth, containerHeight, config.taglineConfig),
+              _businessName(containerWidth, containerHeight, config.textConfigs[TextFieldType.companyName]!),
+              _phoneNumber(containerWidth, containerHeight, config.textConfigs[TextFieldType.phoneNumber]!),
+              _address(containerWidth, containerHeight, config.textConfigs[TextFieldType.address]!),
+              _tagline(containerWidth, containerHeight, config.textConfigs[TextFieldType.tagline]!),
               if (image != null && config.logoImageConfig != null)
                 _logoImage(containerWidth, containerHeight, config.logoImageConfig)
             ],
@@ -72,39 +73,7 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _previewLarge(double containerWidth, double containerHeight) {
-    return Column(
-      children: [
-        Text('Preview $containerWidth x $containerHeight'),
-        const SizedBox(
-          height: 30,
-        ),
-        Container(
-          width: containerWidth,
-          height: containerHeight,
-          decoration: BoxDecoration(
-            color: Colors.blueGrey,
-            image: DecorationImage(
-              image: MemoryImage(frame),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: Stack(
-            children: [
-              _businessName(containerWidth, containerHeight, config.businessNameConfig),
-              _phoneNumber(containerWidth, containerHeight, config.phoneNumberConfig),
-              _address(containerWidth, containerHeight, config.addressConfig),
-              _tagline(containerWidth, containerHeight, config.taglineConfig),
-              if (image != null && config.logoImageConfig != null)
-                _logoImage(containerWidth, containerHeight, config.logoImageConfig)
-            ],
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget _businessName(double containerWidth, double containerHeight, BusinessNameConfig config) {
+  Widget _businessName(double containerWidth, double containerHeight, TextConfig config) {
     // Calculations are now fully dynamic based on configuration percentages
     double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth; // fontSizePercentage is a percentage
     double leftPosition =
@@ -136,7 +105,7 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _phoneNumber(double containerWidth, double containerHeight, PhoneNumberConfig config) {
+  Widget _phoneNumber(double containerWidth, double containerHeight, TextConfig config) {
     // Calculations are now fully dynamic based on configuration percentages
     double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth; // fontSizePercentage is a percentage
     double leftPosition =
@@ -168,7 +137,7 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _address(double containerWidth, double containerHeight, AddressConfig config) {
+  Widget _address(double containerWidth, double containerHeight, TextConfig config) {
     // Calculations are now fully dynamic based on configuration percentages
     double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth; // fontSizePercentage is a percentage
     double leftPosition =
@@ -200,7 +169,7 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _tagline(double containerWidth, double containerHeight, TaglineConfig config) {
+  Widget _tagline(double containerWidth, double containerHeight, TextConfig config) {
     // Calculations are now fully dynamic based on configuration percentages
     double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth; // fontSizePercentage is a percentage
     double leftPosition =
