@@ -1,20 +1,18 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
 import 'package:my_sandesh_web_ui/config.dart';
 
 class PreviewScreen extends StatelessWidget {
-  final Uint8List imageBytes;
+  final Uint8List frame;
+  final Uint8List image;
   final Configuration config;
   final double containerWidth;
   final double containerHeight;
 
-
   const PreviewScreen({
     Key? key,
-    required this.imageBytes,
+    required this.frame,
+    required this.image,
     required this.config,
     required this.containerWidth,
     required this.containerHeight, // Default size is 200. Can also pass 350 when navigating
@@ -26,6 +24,12 @@ class PreviewScreen extends StatelessWidget {
     double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth; // fontSizePercentage is a percentage
     double leftPosition = config.leftMarginPercentage * 0.01 * containerWidth; // Adjust according to margin percentages
     double topPosition = config.topMarginPercentage * 0.01 * containerHeight;
+
+    double imageLeftPosition = config.additionalImageLeftPercentage * 0.01 * containerWidth;
+    double imageTopPosition = config.additionalImageTopPercentage * 0.01 * containerHeight;
+
+    final double additionalImageWidth = config.additionalImageSizeWidthPercentage * containerWidth / 100;
+    final double additionalImageHeight = config.additionalImageSizeHeightPercentage * containerHeight / 100;
 
     // Handle potential hex color format issues (ensure your config.fontColor includes alpha if needed)
     final Color fontColor = Color(int.parse(config.fontColor.substring(1), radix: 16) | 0xFF000000);
@@ -41,7 +45,7 @@ class PreviewScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.blueGrey,
             image: DecorationImage(
-              image: MemoryImage(imageBytes),
+              image: MemoryImage(frame),
               fit: BoxFit.cover,
             ),
           ),
@@ -67,6 +71,16 @@ class PreviewScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              Positioned(
+                left: imageLeftPosition,
+                top: imageTopPosition,
+                child: Image.memory(
+                  // You'll need to pass the Uint8List for the additional image into the PreviewScreen
+                  image,
+                  width: additionalImageWidth, // or use config data if dynamic
+                  height: additionalImageHeight,
+                ),
+              )
             ],
           ),
         ),

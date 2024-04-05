@@ -42,8 +42,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey _containerKey = GlobalKey();
-  File? _pickedImage;
-  Uint8List webImage = Uint8List(8);
+
+  File? _pickedFrame;
+  Uint8List webFrame = Uint8List(8);
+
+  File? _pickedLogo;
+  Uint8List logoImage = Uint8List(8);
+
   bool _isTextAdded = false;
   Offset _textPosition = const Offset(0, 0);
   double _textSize = 14.0;
@@ -51,6 +56,9 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _textEditingController = TextEditingController(text: "Company Name");
   final String _fontName = 'Roboto';
   AspectRatioOption _selectedAspectRatio = AspectRatioOption.oneToOne;
+
+  Offset _additionalImagePosition = Offset(0, 0);
+  Size _additionalImageSize = Size(100, 100);
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +79,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 30,
               ),
               aspectRatioButtons(),
-              SizedBox(height: 30,),
+              SizedBox(
+                height: 30,
+              ),
               ElevatedButton(
                   onPressed: () {
                     _pickImage();
@@ -88,6 +98,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     _showTextOptionsDialog();
                   },
                   child: const Text("Add Company Name")),
+              const SizedBox(
+                height: 30,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _pickLogoImage();
+                },
+                child: const Text("Add Image"),
+              ),
               const SizedBox(
                 height: 30,
               ),
@@ -125,8 +144,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         Container(
                           key: _containerKey,
                           color: Colors.blueGrey,
-                          child: _pickedImage == null ? null : Image.memory(webImage, fit: BoxFit.fill,),
+                          child: _pickedFrame == null
+                              ? null
+                              : Image.memory(
+                                  webFrame,
+                                  fit: BoxFit.fill,
+                                ),
                         ),
+                        if(_isTextAdded != false)
                         Positioned(
                           left: _textPosition.dx,
                           top: _textPosition.dy,
@@ -144,6 +169,31 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
                         ),
+                        if (_pickedLogo != null)
+                          Positioned(
+                            left: _additionalImagePosition.dx,
+                            top: _additionalImagePosition.dy,
+                            child: Draggable(
+                              feedback: Material(
+                                type: MaterialType.transparency,
+                                child: Image.memory(logoImage, width: _additionalImageSize.width, height: _additionalImageSize.height),
+                              ),
+
+                              childWhenDragging: Opacity(
+                                opacity: 0.5,
+                                child: Image.memory(logoImage, width: _additionalImageSize.width, height: _additionalImageSize.height),
+                              ),
+                              onDragEnd: (details) {
+                                // Calculate the new position relative to the container
+                                final RenderBox renderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
+                                final Offset localOffset = renderBox.globalToLocal(details.offset);
+                                setState(() {
+                                  _additionalImagePosition = localOffset;
+                                });
+                              },
+                              child: Image.memory(logoImage, width: _additionalImageSize.width, height: _additionalImageSize.height),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -160,25 +210,35 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _pickImage() async {
-    if (!kIsWeb) {
-      final ImagePicker picker = ImagePicker();
-      XFile? image = await picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        var selected = File(image.path);
-        setState(() {
-          _pickedImage = selected;
-        });
-      } else {
-        print("No Image has been picked");
-      }
-    } else if (kIsWeb) {
+    if (kIsWeb) {
       final ImagePicker _picker = ImagePicker();
       XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         var f = await image.readAsBytes();
         setState(() {
-          webImage = f;
-          _pickedImage = File('a');
+          webFrame = f;
+          _pickedFrame = File('a');
+        });
+      } else {
+        print("No Image has been picked");
+      }
+    } else {
+      print("Something went wrong");
+    }
+  }
+
+  // Method to pick and set the additional image
+  Future<void> _pickLogoImage() async {
+
+    if (kIsWeb) {
+      final ImagePicker _picker = ImagePicker();
+      XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        var f = await image.readAsBytes();
+        setState(() {
+          logoImage = f;
+          _additionalImageSize = Size(100, 100);
+          _pickedLogo = File('a');
         });
       } else {
         print("No Image has been picked");
@@ -254,22 +314,26 @@ class _MyHomePageState extends State<MyHomePage> {
     // This position is already relative to its parent, so no need to adjust with globalToLocal.
     // However, make sure this position does not go negative by clamping it to 0 or above.
 
-
     print("Dx :: ${_textPosition.dx} and Dy :: ${_textPosition.dy}");
 
     final double clampedX = max(0, _textPosition.dx);
     final double clampedY = max(0, _textPosition.dy);
 
+    final double clampedIX = max(0, _additionalImagePosition.dx);
+    final double clampedIY = max(0, _additionalImagePosition.dy);
+
     final configuration = createConfiguration(
       containerWidth: containerRenderBox.size.width,
       containerHeight: containerRenderBox.size.height,
       textPosition: Offset(clampedX, clampedY),
+      imagePosition: Offset(clampedIX, clampedIY),
       fontStyle: 'normal',
       // Adjust based on your logic or UI controls
       fontName: _fontName,
       fontSize: _textSize,
       fontColor: _textColor,
       textContent: _textEditingController.text,
+      imageSize: _additionalImageSize
     );
 
     final String jsonConfig = jsonEncode(configuration.toJson());
@@ -279,7 +343,8 @@ class _MyHomePageState extends State<MyHomePage> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => PreviewScreen(
-            imageBytes: webImage,
+            frame: webFrame,
+            image: logoImage,
             config: configuration,
             containerWidth: 1000,
             containerHeight: 800,
@@ -307,7 +372,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _changeAspectRatio(AspectRatioOption newAspectRatio) {
     setState(() {
       _selectedAspectRatio = newAspectRatio;
-      _pickedImage = null; // Remove the image if aspect ratio changes after selection
+      _pickedFrame = null; // Remove the image if aspect ratio changes after selection
     });
   }
 }

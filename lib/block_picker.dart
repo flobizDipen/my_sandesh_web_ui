@@ -9,7 +9,7 @@ class BlockPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Define a list of colors to pick from
-    final List<Color> _colors = [Colors.red, Colors.green, Colors.blue, Colors.yellow, Colors.purple, Colors.orange];
+    final List<Color> _colors = [Colors.red, Colors.green, Colors.blue, Colors.white, Colors.purple, Colors.black];
 
     return Wrap(
       children: _colors.map((Color color) {

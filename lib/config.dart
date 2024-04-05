@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 
 class Configuration {
@@ -12,18 +10,25 @@ class Configuration {
   final double fontSizePercentage;
   final String fontColor;
   final String textContent;
+  final double additionalImageLeftPercentage;
+  final double additionalImageTopPercentage;
+  final double additionalImageSizeWidthPercentage;
+  final double additionalImageSizeHeightPercentage;
 
-  Configuration({
-    required this.containerWidth,
-    required this.containerHeight,
-    required this.topMarginPercentage,
-    required this.leftMarginPercentage,
-    required this.fontStyle,
-    required this.fontName,
-    required this.fontSizePercentage,
-    required this.fontColor,
-    required this.textContent,
-  });
+  Configuration(
+      {required this.containerWidth,
+      required this.containerHeight,
+      required this.topMarginPercentage,
+      required this.leftMarginPercentage,
+      required this.fontStyle,
+      required this.fontName,
+      required this.fontSizePercentage,
+      required this.fontColor,
+      required this.textContent,
+      required this.additionalImageLeftPercentage,
+      required this.additionalImageTopPercentage,
+      required this.additionalImageSizeWidthPercentage,
+      required this.additionalImageSizeHeightPercentage});
 
   Map<String, dynamic> toJson() {
     return {
@@ -35,10 +40,17 @@ class Configuration {
           "fontSize": fontSizePercentage,
           "fontColor": fontColor,
           "positioning": {
-            "top" : topMarginPercentage,
+            "top": topMarginPercentage,
             "left": leftMarginPercentage,
           }
         },
+        "additionalImage": {
+          "position": {
+            "left": additionalImageLeftPercentage,
+            "top": additionalImageTopPercentage,
+          },
+          "size": {"width": additionalImageSizeWidthPercentage, "height": additionalImageSizeHeightPercentage}, // Assuming fixed size for simplicity
+        }
       }
     };
   }
@@ -48,6 +60,8 @@ Configuration createConfiguration({
   required double containerWidth,
   required double containerHeight,
   required Offset textPosition,
+  required Offset imagePosition,
+  required Size imageSize,
   required String fontStyle,
   required String fontName,
   required double fontSize,
@@ -64,15 +78,25 @@ Configuration createConfiguration({
   final leftMarginPercentage = (textPosition.dx / containerWidth) * 100;
   final topMarginPercentage = (textPosition.dy / containerHeight) * 100;
 
+  final additionalImageLeftPercentage = imagePosition.dx / containerWidth * 100;
+  final additionalImageTopPercentage = imagePosition.dy / containerHeight * 100;
+
+  // Convert imageSize to percentages of the container's dimensions
+  final additionalImageWidthPercentage = (imageSize.width / containerWidth) * 100;
+  final additionalImageHeightPercentage = (imageSize.height / containerHeight) * 100;
+
   return Configuration(
-    containerWidth: containerWidth,
-    containerHeight: containerHeight,
-    topMarginPercentage: topMarginPercentage,
-    leftMarginPercentage: leftMarginPercentage,
-    fontStyle: fontStyle,
-    fontName: fontName,
-    fontSizePercentage: fontSizePercentage,
-    fontColor: fontColorHex,
-    textContent: textContent,
-  );
+      containerWidth: containerWidth,
+      containerHeight: containerHeight,
+      topMarginPercentage: topMarginPercentage,
+      leftMarginPercentage: leftMarginPercentage,
+      fontStyle: fontStyle,
+      fontName: fontName,
+      fontSizePercentage: fontSizePercentage,
+      fontColor: fontColorHex,
+      textContent: textContent,
+      additionalImageLeftPercentage: additionalImageLeftPercentage,
+      additionalImageTopPercentage: additionalImageTopPercentage,
+      additionalImageSizeWidthPercentage: additionalImageWidthPercentage,
+      additionalImageSizeHeightPercentage: additionalImageHeightPercentage);
 }
