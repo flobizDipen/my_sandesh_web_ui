@@ -19,14 +19,33 @@ class AspectRatioSize {
 
 // Helper extension to get dimensions based on enum
 extension AspectRatioOptionExtension on AspectRatioOption {
+  AspectRatioSize get sizeSmall {
+    switch (this) {
+      case AspectRatioOption.oneToOne:
+        return AspectRatioSize(width: 300, height: 300);
+      case AspectRatioOption.threeToTwo:
+        return AspectRatioSize(width: 378, height: 252);
+      case AspectRatioOption.fiveToThree:
+        return AspectRatioSize(width: 400, height: 240);
+      case AspectRatioOption.fourToThree:
+        return AspectRatioSize(width: 520, height: 390);
+      case AspectRatioOption.fiveToFour:
+        return AspectRatioSize(width: 400, height: 320);
+      case AspectRatioOption.sixteenToNine:
+        return AspectRatioSize(width: 320, height: 180);
+      default:
+        return AspectRatioSize(width: 300, height: 300); // Default size
+    }
+  }
+
   AspectRatioSize get size {
     switch (this) {
       case AspectRatioOption.oneToOne:
-        return AspectRatioSize(width: 500, height: 500);
+        return AspectRatioSize(width: 400, height: 400);
       case AspectRatioOption.threeToTwo:
         return AspectRatioSize(width: 600, height: 400);
       case AspectRatioOption.fiveToThree:
-        return AspectRatioSize(width: 800, height: 480);
+        return AspectRatioSize(width: 500, height: 300);
       case AspectRatioOption.fourToThree:
         return AspectRatioSize(width: 640, height: 480);
       case AspectRatioOption.fiveToFour:
@@ -34,12 +53,29 @@ extension AspectRatioOptionExtension on AspectRatioOption {
       case AspectRatioOption.sixteenToNine:
         return AspectRatioSize(width: 640, height: 360);
       default:
+        return AspectRatioSize(width: 400, height: 400); // Default size
+    }
+  }
+
+  AspectRatioSize get sizeLarge {
+    switch (this) {
+      case AspectRatioOption.oneToOne:
+        return AspectRatioSize(width: 500, height: 500);
+      case AspectRatioOption.threeToTwo:
+        return AspectRatioSize(width: 705, height: 470);
+      case AspectRatioOption.fiveToThree:
+        return AspectRatioSize(width: 800, height: 480);
+      case AspectRatioOption.fourToThree:
+        return AspectRatioSize(width: 760, height: 570);
+      case AspectRatioOption.fiveToFour:
+        return AspectRatioSize(width: 700, height: 560);
+      case AspectRatioOption.sixteenToNine:
+        return AspectRatioSize(width: 800, height: 450);
+      default:
         return AspectRatioSize(width: 500, height: 500); // Default size
     }
   }
-}
 
-extension AspectRatioNameExtension on AspectRatioOption {
   String get name {
     switch (this) {
       case AspectRatioOption.oneToOne:

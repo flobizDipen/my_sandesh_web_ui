@@ -43,10 +43,16 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey _containerKey = GlobalKey();
 
   Uint8List? _frameImage;
-  BusinessName businessNameText = BusinessName();
+  FontSupport businessName = FontSupport();
+  FontSupport phoneNumber = FontSupport();
+  FontSupport address = FontSupport();
+  FontSupport tagline = FontSupport();
   Logo? businessLogo = Logo();
 
   final TextEditingController _companyNameController = TextEditingController(text: "Company Name");
+  final TextEditingController _phoneNumberController = TextEditingController(text: "+919725955985");
+  final TextEditingController _addressController = TextEditingController(text: "FloBiz, Bengaluru, Karnataka");
+  final TextEditingController _taglineController = TextEditingController(text: "Business Karneka Naya tareeka");
 
   AspectRatioOption _selectedAspectRatio = AspectRatioOption.oneToOne;
 
@@ -65,28 +71,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: _selectedAspectRatio.size.width,
                   height: _selectedAspectRatio.size.height,
-                  child: GestureDetector(
-                    onPanUpdate: (details) {
-                      setState(() {
-                        businessNameText.textPosition += details.delta;
-                      });
-                    },
-                    child: Stack(
-                      children: [
-                        Container(
-                          key: _containerKey,
-                          color: Colors.blueGrey,
-                          child: _frameImage == null
-                              ? null
-                              : Image.memory(
-                                  _frameImage!,
-                                  fit: BoxFit.fill,
-                                ),
-                        ),
-                        if (businessNameText.isTextAdded != false) _businessNameContainer(),
-                        if (businessLogo?.selectedLogo != null) _businessLogoContainer(),
-                      ],
-                    ),
+                  child: Stack(
+                    children: [
+                      Container(
+                        key: _containerKey,
+                        color: Colors.blueGrey,
+                        child: _frameImage == null
+                            ? null
+                            : Image.memory(
+                                _frameImage!,
+                                fit: BoxFit.fill,
+                              ),
+                      ),
+                      if (businessName.isTextAdded != false) _businessNameContainer(),
+                      if (phoneNumber.isTextAdded != false) _phoneNumberContainer(),
+                      if(address.isTextAdded != false) _addressContainer(),
+                      if(tagline.isTextAdded != false) _taglineContainer(),
+                      if (businessLogo?.selectedLogo != null) _businessLogoContainer(),
+                    ],
                   ),
                 ),
               ],
@@ -133,57 +135,104 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _showTextOptionsDialog() {
+  void _showTextOptionsDialog(
+    TextEditingController controller,
+    FontSupport fontStyle,
+    Function(String) onTextUpdate,
+    Function(FontWeight) onFontWeight,
+    Function(double) onTextSize,
+    Function(Color) onColorChange,
+    Function(String) onFontFamily,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Text Options'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                TextField(
-                  controller: _companyNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Company Name',
-                  ),
-                  onChanged: (value) {
-                    setState(() {});
+        return StatefulBuilder(
+          // Use StatefulBuilder to manage state inside the dialog
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Text Options'),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    TextField(
+                      controller: controller,
+                      decoration: const InputDecoration(
+                        labelText: 'Input Text',
+                      ),
+                      onChanged: (value) {
+                        onTextUpdate(value);
+                      },
+                    ),
+                    const Divider(),
+                    BlockPicker(
+                      pickerColor: fontStyle.textColor, // Use current text color
+                      onColorChanged: (color) {
+                        setState(() {
+                          fontStyle.textColor = color;
+                        });
+                        onColorChange(color);
+                      },
+                    ),
+                    const Divider(),
+                    Slider(
+                      min: 14,
+                      max: 50,
+                      divisions: 36,
+                      value: fontStyle.textSize,
+                      label: fontStyle.textSize.round().toString(),
+                      onChanged: (value) {
+                        setState(() {
+                          fontStyle.textSize = value;
+                        });
+                        onTextSize(value);
+                      },
+                    ),
+                    const Divider(),
+                    DropdownButton<FontWeight>(
+                      value: fontStyle.fontWeight,
+                      items: FontWeight.values.map((FontWeight value) {
+                        return DropdownMenuItem<FontWeight>(
+                          value: value,
+                          child: Text(value.toString().split('.').last),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          fontStyle.fontWeight = value!;
+                        });
+                        onFontWeight(value!);
+                      },
+                    ),
+                    const Divider(),
+                    DropdownButton<String>(
+                      value: fontStyle.fontFamily,
+                      items: <String>['Roboto', 'Open Sans', 'Lato', 'Montserrat'].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          fontStyle.fontFamily = value!;
+                        });
+                        onFontFamily(value!);
+                      },
+                    )
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Done'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
                   },
                 ),
-                divider(),
-                BlockPicker(
-                  pickerColor: businessNameText.textColor, // Use current text color
-                  onColorChanged: (color) {
-                    setState(() {
-                      businessNameText.textColor = color;
-                    });
-                  },
-                ),
-                divider(),
-                Slider(
-                  min: 14,
-                  max: 50,
-                  divisions: 86,
-                  value: businessNameText.textSize,
-                  label: businessNameText.textSize.round().toString(),
-                  onChanged: (value) {
-                    setState(() {
-                      businessNameText.textSize = value;
-                    });
-                  },
-                )
               ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Done'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -195,7 +244,10 @@ class _MyHomePageState extends State<MyHomePage> {
     final configuration = createConfiguration(
       containerWidth: containerRenderBox.size.width,
       containerHeight: containerRenderBox.size.height,
-      businessName: businessNameText,
+      businessName: businessName,
+      phoneNumber: phoneNumber,
+      address: address,
+      tagline: tagline,
       logo: businessLogo,
     );
 
@@ -209,8 +261,8 @@ class _MyHomePageState extends State<MyHomePage> {
             frame: _frameImage!,
             image: businessLogo?.selectedLogo,
             config: configuration,
-            containerWidth: 1000,
-            containerHeight: 800,
+            smallSize: _selectedAspectRatio.sizeSmall,
+            largeSize: _selectedAspectRatio.sizeLarge,
           ),
         ),
       );
@@ -261,14 +313,13 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: const Text("Upload Frame")),
           divider(),
-          ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  businessNameText.isTextAdded = true;
-                });
-                _showTextOptionsDialog();
-              },
-              child: const Text("Add Company Name")),
+          _addCompanyName(),
+          divider(),
+          _addPhoneNumber(),
+          divider(),
+          _addAddress(),
+          divider(),
+          _addTagline(),
           divider(),
           ElevatedButton(
             onPressed: () {
@@ -277,34 +328,12 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Text("Add Image"),
           ),
           divider(),
-          ElevatedButton(onPressed: () {}, child: const Text("Add Phone Number")),
-          divider(),
           ElevatedButton(
               onPressed: () {
                 generateConfig();
               },
               child: const Text("Generate Config")),
         ],
-      ),
-    );
-  }
-
-  Widget _businessNameContainer() {
-    return Positioned(
-      left: businessNameText.textPosition.dx,
-      top: businessNameText.textPosition.dy,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.red),
-        ),
-        child: Text(
-          _companyNameController.text,
-          style: TextStyle(
-            fontFamily: businessNameText.fontName,
-            fontSize: businessNameText.textSize,
-            color: businessNameText.textColor,
-          ),
-        ),
       ),
     );
   }
@@ -348,5 +377,312 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       return Container();
     }
+  }
+
+  Widget _businessNameContainer() {
+    Widget child = Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white),
+      ),
+      child: Text(
+        _companyNameController.text,
+        style: TextStyle(
+          fontFamily: businessName.fontFamily,
+          fontSize: businessName.textSize,
+          color: businessName.textColor,
+          fontWeight: businessName.fontWeight,
+        ),
+      ),
+    );
+
+    return Positioned(
+      left: businessName.textPosition.dx,
+      top: businessName.textPosition.dy,
+      child: Draggable(
+        feedback: Material(
+          type: MaterialType.transparency,
+          child: child,
+        ),
+        childWhenDragging: Opacity(
+          opacity: 0.5,
+          child: child,
+        ),
+        onDragEnd: (details) {
+          // Calculate the new position relative to the container
+          final RenderBox renderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
+          final Offset localOffset = renderBox.globalToLocal(details.offset);
+          setState(() {
+            businessName.textPosition = localOffset;
+          });
+        },
+        child: child,
+      ),
+    );
+  }
+  Widget _phoneNumberContainer() {
+    Widget child = Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white),
+      ),
+      child: Text(
+        _phoneNumberController.text,
+        style: TextStyle(
+          fontFamily: phoneNumber.fontFamily,
+          fontSize: phoneNumber.textSize,
+          color: phoneNumber.textColor,
+        ),
+      ),
+    );
+
+    return Positioned(
+      left: phoneNumber.textPosition.dx,
+      top: phoneNumber.textPosition.dy,
+      child: Draggable(
+        feedback: Material(
+          type: MaterialType.transparency,
+          child: child,
+        ),
+        childWhenDragging: Opacity(
+          opacity: 0.5,
+          child: child,
+        ),
+        onDragEnd: (details) {
+          // Calculate the new position relative to the container
+          final RenderBox renderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
+          final Offset localOffset = renderBox.globalToLocal(details.offset);
+          setState(() {
+            phoneNumber.textPosition = localOffset;
+          });
+        },
+        child: child,
+      ),
+    );
+  }
+
+  Widget _addressContainer() {
+    Widget child = Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white),
+      ),
+      child: Text(
+        _addressController.text,
+        style: TextStyle(
+          fontFamily: address.fontFamily,
+          fontSize: address.textSize,
+          color: address.textColor,
+        ),
+      ),
+    );
+
+    return Positioned(
+      left: address.textPosition.dx,
+      top: address.textPosition.dy,
+      child: Draggable(
+        feedback: Material(
+          type: MaterialType.transparency,
+          child: child,
+        ),
+        childWhenDragging: Opacity(
+          opacity: 0.5,
+          child: child,
+        ),
+        onDragEnd: (details) {
+          // Calculate the new position relative to the container
+          final RenderBox renderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
+          final Offset localOffset = renderBox.globalToLocal(details.offset);
+          setState(() {
+            address.textPosition = localOffset;
+          });
+        },
+        child: child,
+      ),
+    );
+  }
+  Widget _taglineContainer() {
+    Widget child = Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white),
+      ),
+      child: Text(
+        _taglineController.text,
+        style: TextStyle(
+          fontFamily: tagline.fontFamily,
+          fontSize: tagline.textSize,
+          color: tagline.textColor,
+        ),
+      ),
+    );
+
+    return Positioned(
+      left: tagline.textPosition.dx,
+      top: tagline.textPosition.dy,
+      child: Draggable(
+        feedback: Material(
+          type: MaterialType.transparency,
+          child: child,
+        ),
+        childWhenDragging: Opacity(
+          opacity: 0.5,
+          child: child,
+        ),
+        onDragEnd: (details) {
+          // Calculate the new position relative to the container
+          final RenderBox renderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
+          final Offset localOffset = renderBox.globalToLocal(details.offset);
+          setState(() {
+            tagline.textPosition = localOffset;
+          });
+        },
+        child: child,
+      ),
+    );
+  }
+
+  Widget _addCompanyName() {
+    return ElevatedButton(
+        onPressed: () {
+          setState(() {
+            businessName.isTextAdded = true;
+          });
+          _showTextOptionsDialog(
+            _companyNameController,
+            businessName,
+            (String textChange) {
+              setState(() {});
+            },
+            (FontWeight fontWeight) {
+              setState(() {
+                businessName.fontWeight = fontWeight;
+              });
+            },
+            (double fontSize) {
+              setState(() {
+                businessName.textSize = fontSize;
+              });
+            },
+            (Color fontColor) {
+              setState(() {
+                businessName.textColor = fontColor;
+              });
+            },
+            (String fontFamily) {
+              setState(() {
+                businessName.fontFamily = fontFamily;
+              });
+            },
+          );
+        },
+        child: const Text("Add Company Name"));
+  }
+
+  Widget _addPhoneNumber() {
+    return ElevatedButton(
+        onPressed: () {
+          setState(() {
+            phoneNumber.isTextAdded = true;
+          });
+          _showTextOptionsDialog(
+            _phoneNumberController,
+            phoneNumber,
+            (String textChange) {
+              setState(() {});
+            },
+            (FontWeight fontWeight) {
+              setState(() {
+                phoneNumber.fontWeight = fontWeight;
+              });
+            },
+            (double fontSize) {
+              setState(() {
+                phoneNumber.textSize = fontSize;
+              });
+            },
+            (Color fontColor) {
+              setState(() {
+                phoneNumber.textColor = fontColor;
+              });
+            },
+            (String fontFamily) {
+              setState(() {
+                phoneNumber.fontFamily = fontFamily;
+              });
+            },
+          );
+        },
+        child: const Text("Add Phone Number"));
+  }
+
+  Widget _addAddress() {
+    return ElevatedButton(
+        onPressed: () {
+          setState(() {
+            address.isTextAdded = true;
+          });
+          _showTextOptionsDialog(
+            _addressController,
+            address,
+                (String textChange) {
+              setState(() {});
+            },
+                (FontWeight fontWeight) {
+              setState(() {
+                address.fontWeight = fontWeight;
+              });
+            },
+                (double fontSize) {
+              setState(() {
+                address.textSize = fontSize;
+              });
+            },
+                (Color fontColor) {
+              setState(() {
+                address.textColor = fontColor;
+              });
+            },
+                (String fontFamily) {
+              setState(() {
+                address.fontFamily = fontFamily;
+              });
+            },
+          );
+        },
+        child: const Text("Add Address"));
+  }
+
+  Widget _addTagline() {
+    return ElevatedButton(
+        onPressed: () {
+          setState(() {
+            tagline.isTextAdded = true;
+          });
+          _showTextOptionsDialog(
+            _taglineController,
+            tagline,
+                (String textChange) {
+              setState(() {});
+            },
+                (FontWeight fontWeight) {
+              setState(() {
+                tagline.fontWeight = fontWeight;
+              });
+            },
+                (double fontSize) {
+              setState(() {
+                tagline.textSize = fontSize;
+              });
+            },
+                (Color fontColor) {
+              setState(() {
+                tagline.textColor = fontColor;
+              });
+            },
+                (String fontFamily) {
+              setState(() {
+                tagline.fontFamily = fontFamily;
+              });
+            },
+          );
+        },
+        child: const Text("Add Tagline"));
   }
 }
