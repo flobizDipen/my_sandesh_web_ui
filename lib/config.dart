@@ -1,55 +1,40 @@
-import 'package:flutter/material.dart';
+import 'package:my_sandesh_web_ui/final _config.dart';
+
+import 'business_name.dart';
 
 class Configuration {
   final double containerWidth;
   final double containerHeight;
-  final double topMarginPercentage;
-  final double leftMarginPercentage;
-  final String fontStyle;
-  final String fontName;
-  final double fontSizePercentage;
-  final String fontColor;
-  final String textContent;
-  final double additionalImageLeftPercentage;
-  final double additionalImageTopPercentage;
-  final double additionalImageSizeWidthPercentage;
-  final double additionalImageSizeHeightPercentage;
+
+  final BusinessNameConfig businessNameConfig;
+  final LogoImageConfig logoImageConfig;
 
   Configuration(
       {required this.containerWidth,
       required this.containerHeight,
-      required this.topMarginPercentage,
-      required this.leftMarginPercentage,
-      required this.fontStyle,
-      required this.fontName,
-      required this.fontSizePercentage,
-      required this.fontColor,
-      required this.textContent,
-      required this.additionalImageLeftPercentage,
-      required this.additionalImageTopPercentage,
-      required this.additionalImageSizeWidthPercentage,
-      required this.additionalImageSizeHeightPercentage});
+      required this.businessNameConfig,
+      required this.logoImageConfig});
 
   Map<String, dynamic> toJson() {
     return {
       "aspectRatio": "1:1",
       "elements": {
         "businessName": {
-          "fontStyle": fontStyle,
-          "fontName": fontName,
-          "fontSize": fontSizePercentage,
-          "fontColor": fontColor,
+          "fontStyle": businessNameConfig.fontStyle,
+          "fontName": businessNameConfig.fontName,
+          "fontSize": businessNameConfig.fontSizePercentage,
+          "fontColor": businessNameConfig.fontColor,
           "positioning": {
-            "top": topMarginPercentage,
-            "left": leftMarginPercentage,
+            "top": businessNameConfig.textPosition.topMargin,
+            "left": businessNameConfig.textPosition.leftMargin,
           }
         },
         "additionalImage": {
           "position": {
-            "left": additionalImageLeftPercentage,
-            "top": additionalImageTopPercentage,
+            "left": logoImageConfig.logoPosition.leftMargin,
+            "top": logoImageConfig.logoPosition.topMargin,
           },
-          "size": {"width": additionalImageSizeWidthPercentage, "height": additionalImageSizeHeightPercentage}, // Assuming fixed size for simplicity
+          "size": {"width": logoImageConfig.logoSize.width, "height": logoImageConfig.logoSize.height},
         }
       }
     };
@@ -59,44 +44,60 @@ class Configuration {
 Configuration createConfiguration({
   required double containerWidth,
   required double containerHeight,
-  required Offset textPosition,
-  required Offset imagePosition,
-  required Size imageSize,
-  required String fontStyle,
-  required String fontName,
-  required double fontSize,
-  required Color fontColor,
-  required String textContent,
+  required BusinessName businessName,
+  required Logo logo,
 }) {
   // Convert the fontColor to a hex string properly
-  String fontColorHex = '#${fontColor.value.toRadixString(16).padLeft(8, '0')}';
 
-  // Assuming text size scales with width, convert fontSize to a percentage of containerWidth
-  final fontSizePercentage = (fontSize / containerWidth) * 100;
-
-  // Calculate the position of text as a percentage of container's dimensions
-  final leftMarginPercentage = (textPosition.dx / containerWidth) * 100;
-  final topMarginPercentage = (textPosition.dy / containerHeight) * 100;
-
-  final additionalImageLeftPercentage = imagePosition.dx / containerWidth * 100;
-  final additionalImageTopPercentage = imagePosition.dy / containerHeight * 100;
-
-  // Convert imageSize to percentages of the container's dimensions
-  final additionalImageWidthPercentage = (imageSize.width / containerWidth) * 100;
-  final additionalImageHeightPercentage = (imageSize.height / containerHeight) * 100;
+  final businessNameConfig = getBusinessNameConfig(containerWidth, containerHeight, businessName);
+  final logoImageConfig = getLogoImageConfig(containerWidth, containerHeight, logo);
 
   return Configuration(
       containerWidth: containerWidth,
       containerHeight: containerHeight,
-      topMarginPercentage: topMarginPercentage,
-      leftMarginPercentage: leftMarginPercentage,
-      fontStyle: fontStyle,
-      fontName: fontName,
+      businessNameConfig: businessNameConfig,
+      logoImageConfig: logoImageConfig);
+}
+
+BusinessNameConfig getBusinessNameConfig(
+  double containerWidth,
+  double containerHeight,
+  BusinessName businessNameText,
+) {
+  String fontColorHex = '#${businessNameText.textColor.value.toRadixString(16).padLeft(8, '0')}';
+
+  // Assuming text size scales with width, convert fontSize to a percentage of containerWidth
+  final fontSizePercentage = (businessNameText.textSize / containerWidth) * 100;
+
+  final textPosition = businessNameText.getTextPosition();
+  // Calculate the position of text as a percentage of container's dimensions
+  final leftMarginPercentage = (textPosition.dx / containerWidth) * 100;
+  final topMarginPercentage = (textPosition.dy / containerHeight) * 100;
+
+  return BusinessNameConfig(
+      fontStyle: businessNameText.fontStyle,
+      fontName: businessNameText.fontName,
       fontSizePercentage: fontSizePercentage,
       fontColor: fontColorHex,
-      textContent: textContent,
-      additionalImageLeftPercentage: additionalImageLeftPercentage,
-      additionalImageTopPercentage: additionalImageTopPercentage,
-      additionalImageSizeWidthPercentage: additionalImageWidthPercentage,
-      additionalImageSizeHeightPercentage: additionalImageHeightPercentage);
+      textPosition: Position(topMargin: topMarginPercentage, leftMargin: leftMarginPercentage));
+}
+
+LogoImageConfig getLogoImageConfig(
+  double containerWidth,
+  double containerHeight,
+  Logo logoImage,
+) {
+
+  final imagePosition = logoImage.getImagePosition();
+
+  final imageLeftPercentage = imagePosition.dx / containerWidth * 100;
+  final imageTopPercentage = imagePosition.dy / containerHeight * 100;
+
+  // Convert imageSize to percentages of the container's dimensions
+  final widthPercentage = (logoImage.imageSize.width / containerWidth) * 100;
+  final heightPercentage = (logoImage.imageSize.height / containerHeight) * 100;
+
+  return LogoImageConfig(
+      logoPosition: Position(leftMargin: imageLeftPercentage, topMargin: imageTopPercentage),
+      logoSize: Size(width: widthPercentage, height: heightPercentage));
 }
