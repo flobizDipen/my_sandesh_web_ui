@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
+import 'package:my_sandesh_web_ui/utility/aspect_ratio_option.dart';
 import 'package:my_sandesh_web_ui/theme/ms_colors.dart';
 
 class AspectRatioButtons extends StatelessWidget {

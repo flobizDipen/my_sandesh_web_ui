@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
-import 'package:my_sandesh_web_ui/config.dart';
-import 'package:my_sandesh_web_ui/final _config.dart';
+import 'package:my_sandesh_web_ui/utility/aspect_ratio_option.dart';
+import 'package:my_sandesh_web_ui/config/config_generator.dart';
+import 'package:my_sandesh_web_ui/model/final%20_config.dart';
 import 'package:my_sandesh_web_ui/utility/font_weight_utils.dart';
 import 'package:my_sandesh_web_ui/utility/widget_extension.dart';
 

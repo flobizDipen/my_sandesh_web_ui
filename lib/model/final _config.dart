@@ -1,3 +1,36 @@
+
+import 'package:my_sandesh_web_ui/component/text_field_type.dart';
+
+class Configuration {
+  final double containerWidth;
+  final double containerHeight;
+  final Map<TextFieldType, TextConfig?> textConfigs;
+  final LogoImageConfig? logoImageConfig;
+
+  Configuration(
+      {required this.containerWidth,
+        required this.containerHeight,
+        required this.textConfigs,
+        required this.logoImageConfig});
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> elementsJson = {};
+
+    textConfigs.forEach((type, config) {
+      elementsJson[type.name.toString()] = config?.toJson();
+    });
+
+    // Add logo configuration if exists
+    elementsJson['logoImage'] = logoImageConfig?.toJson();
+
+    return {
+      "containerWidth": containerWidth,
+      "containerHeight": containerHeight,
+      "elements": elementsJson,
+    };
+  }
+}
+
 class TextConfig {
   final String fontWeight;
   final String fontName;

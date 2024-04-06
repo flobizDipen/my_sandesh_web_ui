@@ -1,38 +1,8 @@
 import 'package:my_sandesh_web_ui/component/text_field_type.dart';
-import 'package:my_sandesh_web_ui/final _config.dart';
+import 'package:my_sandesh_web_ui/model/final%20_config.dart';
 
-import 'logo_image.dart';
-import 'component/text_element.dart';
-
-class Configuration {
-  final double containerWidth;
-  final double containerHeight;
-  final Map<TextFieldType, TextConfig?> textConfigs;
-  final LogoImageConfig? logoImageConfig;
-
-  Configuration(
-      {required this.containerWidth,
-      required this.containerHeight,
-      required this.textConfigs,
-      required this.logoImageConfig});
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> elementsJson = {};
-
-    textConfigs.forEach((type, config) {
-      elementsJson[type.name.toString()] = config?.toJson();
-    });
-
-    // Add logo configuration if exists
-    elementsJson['logoImage'] = logoImageConfig?.toJson();
-
-    return {
-      "containerWidth": containerWidth,
-      "containerHeight": containerHeight,
-      "elements": elementsJson,
-    };
-  }
-}
+import '../model/text_element.dart';
+import '../model/logo_image.dart';
 
 Configuration createConfiguration({
   required double containerWidth,
@@ -40,7 +10,6 @@ Configuration createConfiguration({
   required List<TextElement> textElements,
   required LogoImage? logo,
 }) {
-
   Map<TextFieldType, TextConfig?> textConfigs = {};
   for (var element in textElements) {
     // Check if the text element is added before generating its config
@@ -65,16 +34,6 @@ Configuration createConfiguration({
       containerHeight: containerHeight,
       textConfigs: textConfigs,
       logoImageConfig: logoImageConfig);
-}
-
-Map<TextFieldType, dynamic> generateDynamicConfig(List<TextElement> textElements, double width, double height) {
-  Map<TextFieldType, dynamic> configs = {};
-
-  for (var element in textElements) {
-    configs[element.type] = getTextConfig(width, height, element.fontProperties);
-  }
-
-  return configs;
 }
 
 TextConfig getTextConfig(

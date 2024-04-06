@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'mySandesh Frame Builder',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black54),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
       ),
       home: const MyHomePage(),

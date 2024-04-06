@@ -1,21 +1,20 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
 import 'package:my_sandesh_web_ui/component/aspect_ratio_button.dart';
 import 'package:my_sandesh_web_ui/component/custom_button.dart';
 import 'package:my_sandesh_web_ui/component/font_properties_dialog.dart';
 import 'package:my_sandesh_web_ui/component/logo_size_configurator.dart';
-import 'package:my_sandesh_web_ui/component/text_element.dart';
 import 'package:my_sandesh_web_ui/component/text_field_type.dart';
-import 'package:my_sandesh_web_ui/config.dart';
-import 'package:my_sandesh_web_ui/logo_image.dart';
-import 'package:my_sandesh_web_ui/preview.dart';
+import 'package:my_sandesh_web_ui/config/config_generator.dart';
+import 'package:my_sandesh_web_ui/model/logo_image.dart';
+import 'package:my_sandesh_web_ui/model/text_element.dart';
+import 'package:my_sandesh_web_ui/screen/preview.dart';
 import 'package:my_sandesh_web_ui/theme/ms_colors.dart';
+import 'package:my_sandesh_web_ui/utility/aspect_ratio_option.dart';
 import 'package:my_sandesh_web_ui/utility/widget_extension.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -239,40 +238,44 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           element.isAdded = true;
         });
-        showTextOptionsDialog(
+
+        showDialog(
             context: context,
-            element: element,
-            onTextUpdate: (String textChange) {
-              setState(() {});
-            },
-            onFontWeight: (FontWeight fontWeight) {
-              setState(() {
-                element.fontProperties.fontWeight = fontWeight;
-              });
-            },
-            onTextSize: (double fontSize) {
-              setState(() {
-                element.fontProperties.textSize = fontSize;
-              });
-            },
-            onColorChange: (Color fontColor) {
-              setState(() {
-                element.fontProperties.textColor = fontColor;
-              });
-            },
-            onFontFamily: (String fontFamily) {
-              setState(() {
-                element.fontProperties.fontFamily = fontFamily;
-              });
-            },
-            onRemove: (TextElement textElement) {
-              setState(() {
-                // Find the element in the list and update its `isAdded` status
-                final index = textElements.indexOf(textElement);
-                if (index != -1) {
-                  textElements[index].isAdded = false;
-                }
-              });
+            builder: (BuildContext context) {
+              return TextStyleOption(
+                  element: element,
+                  onTextUpdate: (String textChange) {
+                    setState(() {});
+                  },
+                  onFontWeight: (FontWeight fontWeight) {
+                    setState(() {
+                      element.fontProperties.fontWeight = fontWeight;
+                    });
+                  },
+                  onTextSize: (double fontSize) {
+                    setState(() {
+                      element.fontProperties.textSize = fontSize;
+                    });
+                  },
+                  onColorChange: (Color fontColor) {
+                    setState(() {
+                      element.fontProperties.textColor = fontColor;
+                    });
+                  },
+                  onFontFamily: (String fontFamily) {
+                    setState(() {
+                      element.fontProperties.fontFamily = fontFamily;
+                    });
+                  },
+                  onRemove: (TextElement textElement) {
+                    setState(() {
+                      // Find the element in the list and update its `isAdded` status
+                      final index = textElements.indexOf(textElement);
+                      if (index != -1) {
+                        textElements[index].isAdded = false;
+                      }
+                    });
+                  });
             });
       },
     );
