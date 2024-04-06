@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
 import 'package:my_sandesh_web_ui/config.dart';
 import 'package:my_sandesh_web_ui/final _config.dart';
+import 'package:my_sandesh_web_ui/utility/font_weight_utils.dart';
+import 'package:my_sandesh_web_ui/utility/widget_extension.dart';
 
 class PreviewScreen extends StatelessWidget {
   final Uint8List frame;
@@ -11,7 +13,7 @@ class PreviewScreen extends StatelessWidget {
   final AspectRatioSize smallSize;
   final AspectRatioSize largeSize;
 
-  PreviewScreen({
+  const PreviewScreen({
     super.key,
     required this.frame,
     required this.image,
@@ -29,24 +31,22 @@ class PreviewScreen extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _preview(smallSize.width, smallSize.height),
+            _preview(context, smallSize.width, smallSize.height),
             const SizedBox(
               width: 30,
             ),
-            _preview(largeSize.width, largeSize.height)
+            _preview(context, largeSize.width, largeSize.height)
           ],
         ),
       ),
     );
   }
 
-  Widget _preview(double containerWidth, double containerHeight) {
+  Widget _preview(BuildContext context, double containerWidth, double containerHeight) {
     return Column(
       children: [
         Text('Preview $containerWidth x $containerHeight'),
-        const SizedBox(
-          height: 30,
-        ),
+        context.divider(),
         Container(
           width: containerWidth,
           height: containerHeight,
@@ -117,7 +117,7 @@ class PreviewScreen extends StatelessWidget {
               fontSize: scaledFontSize,
               color: fontColor,
               fontFamily: config.fontName,
-              fontWeight: stringToFontWeight(config.fontWeight),
+              fontWeight: FontWeightUtils.stringToFontWeight(config.fontWeight),
             ),
           ),
         ),
@@ -142,25 +142,5 @@ class PreviewScreen extends StatelessWidget {
         height: additionalImageHeight,
       ),
     );
-  }
-
-  final Map<String, FontWeight> fontWeightMap = {
-    'normal': FontWeight.normal,
-    'bold': FontWeight.bold,
-    '100': FontWeight.w100,
-    '200': FontWeight.w200,
-    '300': FontWeight.w300,
-    '400': FontWeight.w400, // same as normal
-    '500': FontWeight.w500,
-    '600': FontWeight.w600,
-    '700': FontWeight.w700, // same as bold
-    '800': FontWeight.w800,
-    '900': FontWeight.w900,
-  };
-
-  // Function to convert a string to a FontWeight
-  FontWeight stringToFontWeight(String fontWeightString) {
-    // Return the corresponding FontWeight, or FontWeight.normal as a default
-    return fontWeightMap[fontWeightString] ?? FontWeight.normal;
   }
 }

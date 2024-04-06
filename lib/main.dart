@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_sandesh_web_ui/aspect_ratio_option.dart';
-import 'package:my_sandesh_web_ui/logo_image.dart';
 import 'package:my_sandesh_web_ui/component/font_properties_dialog.dart';
+import 'package:my_sandesh_web_ui/component/logo_size_configurator.dart';
 import 'package:my_sandesh_web_ui/component/text_element.dart';
 import 'package:my_sandesh_web_ui/component/text_field_type.dart';
 import 'package:my_sandesh_web_ui/config.dart';
+import 'package:my_sandesh_web_ui/logo_image.dart';
 import 'package:my_sandesh_web_ui/preview.dart';
 import 'package:my_sandesh_web_ui/utility/widget_extension.dart';
 
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'mySandesh Frame Builder',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black54),
         useMaterial3: true,
       ),
       home: const MyHomePage(),
@@ -48,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Uint8List? _frameImage;
   LogoImage? businessLogo;
 
-  AspectRatioOption _selectedAspectRatio = AspectRatioOption.oneToOne;
+  AspectRatioOption _selectedAspectRatio = AspectRatioOption.values.first;
 
   @override
   void initState() {
@@ -105,12 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Container(
                         key: _containerKey,
                         color: Colors.blueGrey,
-                        child: _frameImage == null
-                            ? null
-                            : Image.memory(
-                                _frameImage!,
-                                fit: BoxFit.fill,
-                              ),
+                        child: _frameImage == null ? null : Image.memory(_frameImage!, fit: BoxFit.fill,),
                       ),
                       ...textElements.where((element) => element.isAdded).map((element) {
                         return _textContainer(element);
@@ -127,39 +123,21 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _pickImage() async {
+  // Updated to use a generic function for picking images
+  Future<void> pickImageAndUpdateState(Function(Uint8List) updateStateCallback) async {
     if (kIsWeb) {
-      final ImagePicker _picker = ImagePicker();
-      XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      final ImagePicker picker = ImagePicker();
+      XFile? image = await picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
-        var f = await image.readAsBytes();
+        var imageBytes = await image.readAsBytes();
         setState(() {
-          _frameImage = f;
+          updateStateCallback(imageBytes);
         });
       } else {
         print("No Image has been picked");
       }
     } else {
-      print("Something went wrong");
-    }
-  }
-
-  // Method to pick and set the additional image
-  Future<void> _pickLogoImage() async {
-    if (kIsWeb) {
-      final ImagePicker _picker = ImagePicker();
-      XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        var logoBytes = await image.readAsBytes();
-        setState(() {
-          businessLogo = LogoImage()..selectedLogo = logoBytes;
-          businessLogo?.imageSize = const Size(100, 100);
-        });
-      } else {
-        print("No Image has been picked");
-      }
-    } else {
-      print("Something went wrong");
+      print("Image picking is only supported on web in this context");
     }
   }
 
@@ -189,31 +167,28 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
     }).catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to copy configuration: $error')));
+      context.showSnackBar('Failed to copy configuration: $error');
     });
   }
 
   Widget aspectRatioButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Wrap(
+      spacing: 8.0, // Gap between chips
       children: AspectRatioOption.values.map((aspectRatio) {
-        return Padding(
-          padding: const EdgeInsets.only(right: 14),
-          child: ElevatedButton(
-            onPressed: () => _changeAspectRatio(aspectRatio),
-            child: Text(aspectRatio.name),
-          ),
+        return ChoiceChip(
+          label: Text(aspectRatio.name),
+          selected: _selectedAspectRatio == aspectRatio,
+          onSelected: (bool selected) {
+            setState(() {
+              if (selected) {
+                _selectedAspectRatio = aspectRatio;
+                _frameImage = null;
+              }
+            });
+          },
         );
       }).toList(),
     );
-  }
-
-  // Function to handle aspect ratio change
-  void _changeAspectRatio(AspectRatioOption newAspectRatio) {
-    setState(() {
-      _selectedAspectRatio = newAspectRatio;
-      _frameImage = null; // Remove the image if aspect ratio changes after selection
-    });
   }
 
   Widget _buttonView() {
@@ -231,26 +206,53 @@ class _MyHomePageState extends State<MyHomePage> {
           context.divider(),
           ElevatedButton(
               onPressed: () {
-                _pickImage();
+                pickImageAndUpdateState((imageBytes) {
+                  _frameImage = imageBytes;
+                });
               },
               child: const Text("Upload Frame")),
           context.divider(),
           _textElementButton(),
           context.divider(),
-          ElevatedButton(
-            onPressed: () {
-              _pickLogoImage();
-            },
-            child: const Text("Add Image"),
-          ),
+          _addLogo(),
           context.divider(),
           ElevatedButton(
               onPressed: () {
-                generateConfig();
+                if (_frameImage != null) {
+                  generateConfig();
+                } else {
+                  context.showSnackBar('Please Select Frame');
+                }
               },
               child: const Text("Generate Config")),
         ],
       ),
+    );
+  }
+
+  Widget _addLogo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            pickImageAndUpdateState((imageBytes) {
+              businessLogo = LogoImage()..selectedLogo = imageBytes;
+              businessLogo?.imageSize = const Size(100, 100); // You can adjust the size as needed
+            });
+          },
+          child: const Text('Add Logo'),
+        ),
+        if (businessLogo?.selectedLogo != null) ...[
+          LogoSizeConfigurator(
+            onSizeChange: (size) {
+              setState(() {
+                businessLogo?.imageSize = Size(size.width, size.height);
+              });
+            },
+          )
+        ],
+      ],
     );
   }
 
@@ -294,33 +296,40 @@ class _MyHomePageState extends State<MyHomePage> {
           element.isAdded = true;
         });
         showTextOptionsDialog(
-          context: context,
-          controller: element.controller,
-          fontStyle: element.fontProperties,
-          onTextUpdate: (String textChange) {
-            // This can be kept empty if the controller is directly updating the model
-          },
-          onFontWeight: (FontWeight fontWeight) {
-            setState(() {
-              element.fontProperties.fontWeight = fontWeight;
+            context: context,
+            element: element,
+            onTextUpdate: (String textChange) {
+              setState(() {});
+            },
+            onFontWeight: (FontWeight fontWeight) {
+              setState(() {
+                element.fontProperties.fontWeight = fontWeight;
+              });
+            },
+            onTextSize: (double fontSize) {
+              setState(() {
+                element.fontProperties.textSize = fontSize;
+              });
+            },
+            onColorChange: (Color fontColor) {
+              setState(() {
+                element.fontProperties.textColor = fontColor;
+              });
+            },
+            onFontFamily: (String fontFamily) {
+              setState(() {
+                element.fontProperties.fontFamily = fontFamily;
+              });
+            },
+            onRemove: (TextElement textElement) {
+              setState(() {
+                // Find the element in the list and update its `isAdded` status
+                final index = textElements.indexOf(textElement);
+                if (index != -1) {
+                  textElements[index].isAdded = false;
+                }
+              });
             });
-          },
-          onTextSize: (double fontSize) {
-            setState(() {
-              element.fontProperties.textSize = fontSize;
-            });
-          },
-          onColorChange: (Color fontColor) {
-            setState(() {
-              element.fontProperties.textColor = fontColor;
-            });
-          },
-          onFontFamily: (String fontFamily) {
-            setState(() {
-              element.fontProperties.fontFamily = fontFamily;
-            });
-          },
-        );
       },
       child: Text(element.buttonText),
     );
@@ -367,12 +376,19 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _textElementButton() {
-    // Example for Company Name, repeat for others as needed
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 30),
       child: Column(
-        children: textElements.map((element) {
-          return _addTextFieldButton(element);
+        crossAxisAlignment: CrossAxisAlignment.start, // Ensure left alignment
+        children: textElements.asMap().entries.map((entry) {
+          int index = entry.key;
+          TextElement element = entry.value;
+
+          // Add top padding to all elements except the first one
+          return Padding(
+            padding: EdgeInsets.only(top: index == 0 ? 0 : 20), // Adjust the padding as needed
+            child: _addTextFieldButton(element),
+          );
         }).toList(),
       ),
     );
