@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:my_sandesh_web_ui/component/text_color_picker.dart';
 import 'package:my_sandesh_web_ui/model/text_element.dart';
 import 'package:my_sandesh_web_ui/theme/ms_colors.dart';
+import 'package:my_sandesh_web_ui/utility/font_weight_utils.dart';
+import 'package:my_sandesh_web_ui/utility/widget_extension.dart';
 
 class TextStyleOption extends StatefulWidget {
   final TextElement element;
@@ -50,7 +52,6 @@ class _TextStyleOptionState extends State<TextStyleOption> {
 
   @override
   Widget build(BuildContext context) {
-
     // Determine the dialog width
     double dialogWidth = MediaQuery.of(context).size.width * 0.8;
 
@@ -71,9 +72,17 @@ class _TextStyleOptionState extends State<TextStyleOption> {
                 widget.onTextUpdate(value);
               },
             ),
-            const Divider(),
+            context.divider(),
+            const Text(
+              "Font Color",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
             TextColorPicker(initialColor: widget.element.fontProperties.textColor, onColorChange: changeColor),
-            const Divider(),
+            context.divider(),
+            const Text(
+              "Font Size",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
             Slider(
               min: 8,
               max: 50,
@@ -87,13 +96,17 @@ class _TextStyleOptionState extends State<TextStyleOption> {
                 widget.onTextSize(value);
               },
             ),
-            const Divider(),
+            context.divider(),
+            const Text(
+              "Font Weight",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
             DropdownButton<FontWeight>(
               value: widget.element.fontProperties.fontWeight,
-              items: FontWeight.values.map((FontWeight value) {
+              items: FontWeightUtils.fontWeightNames.entries.map((entry) {
                 return DropdownMenuItem<FontWeight>(
-                  value: value,
-                  child: Text(value.toString().split('.').last),
+                  value: entry.key,
+                  child: Text(entry.value),
                 );
               }).toList(),
               onChanged: (value) {
@@ -103,22 +116,13 @@ class _TextStyleOptionState extends State<TextStyleOption> {
                 widget.onFontWeight(value!);
               },
             ),
-            const Divider(),
-            DropdownButton<String>(
-              value: widget.element.fontProperties.fontFamily,
-              items: <String>['Roboto', 'Open Sans', 'Lato', 'Montserrat'].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  widget.element.fontProperties.fontFamily = value!;
-                });
-                widget.onFontFamily(value!);
-              },
-            )
+            context.divider(),
+            const Text(
+              "Font Family",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            context.divider(height: 10),
+            _buildFontFamilyChips()
           ],
         ),
       ),
@@ -138,6 +142,45 @@ class _TextStyleOptionState extends State<TextStyleOption> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildFontFamilyChips() {
+    List<String> fontFamilies = ['Roboto', 'Open Sans', 'Lato', 'Montserrat']; // Define your font families here
+
+    return Wrap(
+      spacing: 8.0,
+      crossAxisAlignment: WrapCrossAlignment.start,
+      children: fontFamilies.map((String font) {
+        return ChoiceChip(
+          label: Text(font,
+              style: const TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+                color: MSColors.actionBar, // Text color
+              )),
+          selected: widget.element.fontProperties.fontFamily == font,
+          backgroundColor: Colors.white60,
+          selectedColor: Colors.blueAccent,
+          showCheckmark: false,
+          labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+          padding: const EdgeInsets.all(8),
+          shape: StadiumBorder(
+            side: BorderSide(
+              color: widget.element.fontProperties.fontFamily == font ? Colors.blueAccent.shade400 : Colors.white60,
+              // Change border color based on selection
+              width: 1,
+            ),
+          ),
+          onSelected: (bool selected) {
+            setState(() {
+              // Update font family when a chip is selected
+              widget.element.fontProperties.fontFamily = font;
+              widget.onFontFamily(font); // Notify the parent widget of the change
+            });
+          },
+        );
+      }).toList(),
     );
   }
 }
