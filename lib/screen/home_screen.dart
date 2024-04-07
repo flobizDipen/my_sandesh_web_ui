@@ -267,6 +267,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       element.fontProperties.fontFamily = fontFamily;
                     });
                   },
+                  onTextAlign: (TextAlign textAlign) {
+                    setState(() {
+                      element.fontProperties.textAlign = textAlign;
+                    });
+                  },
                   onRemove: (TextElement textElement) {
                     setState(() {
                       // Find the element in the list and update its `isAdded` status
@@ -288,6 +293,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       child: Text(
         element.controller.text,
+        textAlign: element.fontProperties.textAlign,
         style: TextStyle(
           fontFamily: element.fontProperties.fontFamily,
           fontSize: element.fontProperties.textSize,

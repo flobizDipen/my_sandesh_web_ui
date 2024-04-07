@@ -1,9 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:my_sandesh_web_ui/model/final_config.dart';
 import 'package:my_sandesh_web_ui/utility/aspect_ratio_option.dart';
-import 'package:my_sandesh_web_ui/config/config_generator.dart';
-import 'package:my_sandesh_web_ui/model/final%20_config.dart';
-import 'package:my_sandesh_web_ui/utility/font_weight_utils.dart';
+import 'package:my_sandesh_web_ui/utility/font_utils.dart';
 import 'package:my_sandesh_web_ui/utility/widget_extension.dart';
 
 class PreviewScreen extends StatelessWidget {
@@ -91,12 +92,14 @@ class PreviewScreen extends StatelessWidget {
     }).toList();
   }
 
-  Widget _buildTextWidget({
+  /*Widget _buildTextWidget({
     required double containerWidth,
     required double containerHeight,
     required TextConfig config,
     required String textContent,
   }) {
+    TextAlign textAlign = _stringToTextAlign(config.textAlignment);
+
     double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth;
     double leftPosition = config.textPosition.leftMargin * 0.01 * containerWidth;
     double topPosition = config.textPosition.topMargin * 0.01 * containerHeight;
@@ -113,12 +116,89 @@ class PreviewScreen extends StatelessWidget {
           fit: BoxFit.scaleDown,
           child: Text(
             textContent,
+            textAlign: textAlign,
             style: TextStyle(
               fontSize: scaledFontSize,
               color: fontColor,
               fontFamily: config.fontName,
-              fontWeight: FontWeightUtils.stringToFontWeight(config.fontWeight),
+              fontWeight: FontUtils.stringToFontWeight(config.fontWeight),
             ),
+          ),
+        ),
+      ),
+    );
+  }*/
+
+  Widget _buildTextWidget({
+    required double containerWidth,
+    required double containerHeight,
+    required TextConfig config,
+    required String textContent,
+  }) {
+    double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth;
+    TextAlign textAlign = _stringToTextAlign(config.textAlignment);
+
+    final textStyle = TextStyle(
+      fontSize: scaledFontSize,
+      fontFamily: config.fontName,
+      fontWeight: FontUtils.stringToFontWeight(config.fontWeight),
+    );
+
+    // Measure the text painter with the given text and style.
+    final textPainter = TextPainter(
+      text: TextSpan(text: textContent, style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout(minWidth: 0, maxWidth: double.infinity);
+
+    double textWidth = textPainter.width;
+
+    /*// Calculate the starting left position based on the alignment.
+    double leftPosition;
+    if (textAlign == TextAlign.center) {
+      leftPosition = (config.textPosition.leftMargin * 0.01 * containerWidth) - (textWidth / 2);
+    } else if (textAlign == TextAlign.right) {
+      // For right-aligned text, start position is the leftMargin minus the text's width
+      leftPosition = (config.textPosition.leftMargin * 0.01 * containerWidth) - textWidth;
+    } else {
+      leftPosition = config.textPosition.leftMargin * 0.01 * containerWidth;
+    }*/
+    // Logic for positioning based on text alignment
+    double leftPosition;
+    switch (textAlign) {
+      case TextAlign.left:
+        leftPosition = config.textPosition.leftMargin * 0.01 * containerWidth;
+        break;
+      case TextAlign.center:
+        leftPosition = (config.textPosition.leftMargin * 0.01 * containerWidth) - (textWidth / 2);
+        break;
+      case TextAlign.right:
+        double rightMargin = config.textPosition.rightMargin * 0.01 * containerWidth;
+        // For right-aligned text, align the right edge of the text with the rightMargin
+        leftPosition = containerWidth - rightMargin - textWidth;
+        break;
+      default:
+        leftPosition = config.textPosition.leftMargin * 0.01 * containerWidth;
+        break;
+    }
+
+    // Ensure the position is not negative.
+    leftPosition = max(0, leftPosition);
+
+    double topPosition = config.textPosition.topMargin * 0.01 * containerHeight;
+
+    return Positioned(
+      left: leftPosition,
+      top: topPosition,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.red),
+        ),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            textContent,
+            textAlign: textAlign,
+            style: textStyle,
           ),
         ),
       ),
@@ -142,5 +222,22 @@ class PreviewScreen extends StatelessWidget {
         height: additionalImageHeight,
       ),
     );
+  }
+
+  TextAlign _stringToTextAlign(String textAlignString) {
+    switch (textAlignString) {
+      case 'left':
+        return TextAlign.left;
+      case 'start':
+        return TextAlign.left;
+      case 'center':
+        return TextAlign.center;
+      case 'right':
+        return TextAlign.right;
+      case 'end':
+        return TextAlign.right;
+      default:
+        return TextAlign.start; // Default or fallback alignment
+    }
   }
 }

@@ -1,8 +1,8 @@
 import 'package:my_sandesh_web_ui/component/text_field_type.dart';
-import 'package:my_sandesh_web_ui/model/final%20_config.dart';
+import 'package:my_sandesh_web_ui/model/final_config.dart';
 
-import '../model/text_element.dart';
 import '../model/logo_image.dart';
+import '../model/text_element.dart';
 
 Configuration createConfiguration({
   required double containerWidth,
@@ -50,13 +50,20 @@ TextConfig getTextConfig(
   // Calculate the position of text as a percentage of container's dimensions
   final leftMarginPercentage = (textPosition.dx / containerWidth) * 100;
   final topMarginPercentage = (textPosition.dy / containerHeight) * 100;
+  final rightMarginPercentage = (containerWidth - textPosition.dx) / containerWidth * 100;
 
   return TextConfig(
-      fontWeight: fontProperties.fontWeight.value.toString(),
-      fontName: fontProperties.fontFamily,
-      fontSizePercentage: fontSizePercentage,
-      fontColor: fontColorHex,
-      textPosition: Position(topMargin: topMarginPercentage, leftMargin: leftMarginPercentage));
+    fontWeight: fontProperties.fontWeight.value.toString(),
+    fontName: fontProperties.fontFamily,
+    fontSizePercentage: fontSizePercentage,
+    fontColor: fontColorHex,
+    textPosition: Position(
+      topMargin: topMarginPercentage,
+      leftMargin: leftMarginPercentage,
+      rightMargin: rightMarginPercentage,
+    ),
+    textAlignment: fontProperties.textAlign.name,
+  );
 }
 
 LogoImageConfig getLogoImageConfig(
@@ -74,6 +81,6 @@ LogoImageConfig getLogoImageConfig(
   final heightPercentage = (logoImage.imageSize.height / containerHeight) * 100;
 
   return LogoImageConfig(
-      logoPosition: Position(leftMargin: imageLeftPercentage, topMargin: imageTopPercentage),
+      logoPosition: Position(leftMargin: imageLeftPercentage, topMargin: imageTopPercentage, rightMargin: 0),
       logoSize: Size(width: widthPercentage, height: heightPercentage));
 }

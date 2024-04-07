@@ -1,4 +1,3 @@
-
 import 'package:my_sandesh_web_ui/component/text_field_type.dart';
 
 class Configuration {
@@ -9,9 +8,9 @@ class Configuration {
 
   Configuration(
       {required this.containerWidth,
-        required this.containerHeight,
-        required this.textConfigs,
-        required this.logoImageConfig});
+      required this.containerHeight,
+      required this.textConfigs,
+      required this.logoImageConfig});
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> elementsJson = {};
@@ -37,6 +36,7 @@ class TextConfig {
   final double fontSizePercentage;
   final String fontColor;
   final Position textPosition;
+  final String textAlignment;
 
   TextConfig({
     required this.fontWeight,
@@ -44,6 +44,7 @@ class TextConfig {
     required this.fontSizePercentage,
     required this.fontColor,
     required this.textPosition,
+    required this.textAlignment,
   });
 
   Map<String, dynamic> toJson() => {
@@ -51,7 +52,8 @@ class TextConfig {
         'fontName': fontName,
         'fontSizePercentage': fontSizePercentage,
         'fontColor': fontColor,
-        'textPosition': textPosition.toJson(), // Assuming Position also has a .toJson()
+        'textPosition': textPosition.toJson(),
+        'textAlignment': textAlignment,
       };
 }
 
@@ -70,12 +72,18 @@ class LogoImageConfig {
 class Position {
   final double topMargin;
   final double leftMargin;
+  final double rightMargin;
 
-  Position({required this.topMargin, required this.leftMargin});
+  Position({
+    required this.topMargin,
+    required this.leftMargin,
+    required this.rightMargin,
+  });
 
   Map<String, dynamic> toJson() => {
         'topMargin': topMargin,
         'leftMargin': leftMargin,
+        'rightMargin': rightMargin,
       };
 }
 

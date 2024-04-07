@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class FontWeightUtils {
+class FontUtils {
   static const Map<String, FontWeight> _fontWeightMap = {
     'normal': FontWeight.normal,
     'bold': FontWeight.bold,
@@ -31,4 +31,11 @@ class FontWeightUtils {
     // Return the corresponding FontWeight, or FontWeight.normal as a default
     return _fontWeightMap[fontWeightString] ?? FontWeight.normal;
   }
+
+  static Map<TextAlign, String> textAlignNames = {
+    TextAlign.left: "Left",
+    TextAlign.center: "Center",
+    TextAlign.right: "Right",
+    // Include any other alignments you wish to support
+  };
 }

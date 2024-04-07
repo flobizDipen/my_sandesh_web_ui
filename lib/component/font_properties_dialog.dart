@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_sandesh_web_ui/component/text_color_picker.dart';
 import 'package:my_sandesh_web_ui/model/text_element.dart';
 import 'package:my_sandesh_web_ui/theme/ms_colors.dart';
-import 'package:my_sandesh_web_ui/utility/font_weight_utils.dart';
+import 'package:my_sandesh_web_ui/utility/font_utils.dart';
 import 'package:my_sandesh_web_ui/utility/widget_extension.dart';
 
 class TextStyleOption extends StatefulWidget {
@@ -12,6 +12,7 @@ class TextStyleOption extends StatefulWidget {
   final Function(double) onTextSize;
   final Function(Color) onColorChange;
   final Function(String) onFontFamily;
+  final Function(TextAlign) onTextAlign;
   final Function(TextElement) onRemove;
 
   const TextStyleOption({
@@ -22,6 +23,7 @@ class TextStyleOption extends StatefulWidget {
     required this.onTextSize,
     required this.onColorChange,
     required this.onFontFamily,
+    required this.onTextAlign,
     required this.onRemove,
   });
 
@@ -98,12 +100,34 @@ class _TextStyleOptionState extends State<TextStyleOption> {
             ),
             context.divider(),
             const Text(
+              "Text Alignment",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            DropdownButton<TextAlign>(
+              value: widget.element.fontProperties.textAlign,
+              onChanged: (TextAlign? newValue) {
+                setState(() {
+                  if (newValue != null) {
+                    widget.element.fontProperties.textAlign = newValue;
+                    widget.onTextAlign(newValue);
+                  }
+                });
+              },
+              items: FontUtils.textAlignNames.entries.map((entry) {
+                return DropdownMenuItem<TextAlign>(
+                  value: entry.key,
+                  child: Text(entry.value),
+                );
+              }).toList(),
+            ),
+            context.divider(),
+            const Text(
               "Font Weight",
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
             DropdownButton<FontWeight>(
               value: widget.element.fontProperties.fontWeight,
-              items: FontWeightUtils.fontWeightNames.entries.map((entry) {
+              items: FontUtils.fontWeightNames.entries.map((entry) {
                 return DropdownMenuItem<FontWeight>(
                   value: entry.key,
                   child: Text(entry.value),
