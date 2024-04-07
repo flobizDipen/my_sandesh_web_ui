@@ -28,6 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey _containerKey = GlobalKey();
   List<TextElement> textElements = [];
 
+  String? _frameName;
   Uint8List? _frameImage;
   LogoImage? businessLogo;
 
@@ -82,14 +83,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // Updated to use a generic function for picking images
-  Future<void> pickImageAndUpdateState(Function(Uint8List) updateStateCallback) async {
+  Future<void> pickImageAndUpdateState(Function(Uint8List, String) updateStateCallback) async {
     if (kIsWeb) {
       final ImagePicker picker = ImagePicker();
       XFile? image = await picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         var imageBytes = await image.readAsBytes();
         setState(() {
-          updateStateCallback(imageBytes);
+          updateStateCallback(imageBytes, image.name);
         });
       } else {
         print("No Image has been picked");
@@ -103,6 +104,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final RenderBox containerRenderBox = _containerKey.currentContext!.findRenderObject() as RenderBox;
 
     final configuration = createConfiguration(
+      fileName: _frameName ?? "",
+      aspectRatio: _selectedAspectRatio.name,
       containerWidth: containerRenderBox.size.width,
       containerHeight: containerRenderBox.size.height,
       textElements: textElements,
@@ -120,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
             image: businessLogo?.selectedLogo,
             config: configuration,
             smallSize: _selectedAspectRatio.sizeSmall,
-            largeSize: _selectedAspectRatio.sizeLarge,
+            largeSize: _selectedAspectRatio.sizeExtraLarge,
           ),
         ),
       );
@@ -149,7 +152,8 @@ class _MyHomePageState extends State<MyHomePage> {
           CustomButton(
             label: "Upload Frame",
             onPressed: () {
-              pickImageAndUpdateState((imageBytes) {
+              pickImageAndUpdateState((imageBytes, fileName) {
+                _frameName = fileName;
                 _frameImage = imageBytes;
               });
             },
@@ -180,7 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
         CustomButton(
             label: "Add Logo",
             onPressed: () {
-              pickImageAndUpdateState((imageBytes) {
+              pickImageAndUpdateState((imageBytes, fileName) {
                 businessLogo = LogoImage()..selectedLogo = imageBytes;
                 businessLogo?.imageSize = const Size(100, 100); // You can adjust the size as needed
               });

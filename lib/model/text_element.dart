@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:my_sandesh_web_ui/component/text_field_type.dart';
+import 'package:my_sandesh_web_ui/theme/ms_colors.dart';
 
 class FontProperties {
   double textSize;
@@ -12,11 +13,11 @@ class FontProperties {
   TextAlign textAlign;
 
   FontProperties({
-    this.textSize = 14.0,
+    this.textSize = 20.0,
     this.fontWeight = FontWeight.normal,
-    this.textColor = Colors.black,
+    this.textColor = MSColors.neutralWhite,
     this.fontFamily = 'Roboto',
-    this.textPosition = const Offset(0, 0),
+    this.textPosition = const Offset(20, 20),
     this.textAlign = TextAlign.left,
   });
 

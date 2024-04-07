@@ -7,6 +7,8 @@ import '../model/text_element.dart';
 Configuration createConfiguration({
   required double containerWidth,
   required double containerHeight,
+  required String fileName,
+  required String aspectRatio,
   required List<TextElement> textElements,
   required LogoImage? logo,
 }) {
@@ -29,11 +31,10 @@ Configuration createConfiguration({
     logoImageConfig = getLogoImageConfig(containerWidth, containerHeight, logo);
   }
 
-  return Configuration(
-      containerWidth: containerWidth,
-      containerHeight: containerHeight,
-      textConfigs: textConfigs,
-      logoImageConfig: logoImageConfig);
+  FrameConfig frameConfig = FrameConfig(
+      name: fileName, aspectRatio: aspectRatio, containerWidth: containerWidth, containerHeight: containerHeight);
+
+  return Configuration(frameConfig: frameConfig, textConfigs: textConfigs, logoImageConfig: logoImageConfig);
 }
 
 TextConfig getTextConfig(
@@ -50,7 +51,6 @@ TextConfig getTextConfig(
   // Calculate the position of text as a percentage of container's dimensions
   final leftMarginPercentage = (textPosition.dx / containerWidth) * 100;
   final topMarginPercentage = (textPosition.dy / containerHeight) * 100;
-  final rightMarginPercentage = (containerWidth - textPosition.dx) / containerWidth * 100;
 
   return TextConfig(
     fontWeight: fontProperties.fontWeight.value.toString(),
@@ -60,7 +60,6 @@ TextConfig getTextConfig(
     textPosition: Position(
       topMargin: topMarginPercentage,
       leftMargin: leftMarginPercentage,
-      rightMargin: rightMarginPercentage,
     ),
     textAlignment: fontProperties.textAlign.name,
   );
@@ -81,6 +80,9 @@ LogoImageConfig getLogoImageConfig(
   final heightPercentage = (logoImage.imageSize.height / containerHeight) * 100;
 
   return LogoImageConfig(
-      logoPosition: Position(leftMargin: imageLeftPercentage, topMargin: imageTopPercentage, rightMargin: 0),
+      logoPosition: Position(
+        leftMargin: imageLeftPercentage,
+        topMargin: imageTopPercentage,
+      ),
       logoSize: Size(width: widthPercentage, height: heightPercentage));
 }

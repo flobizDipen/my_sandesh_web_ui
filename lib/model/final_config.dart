@@ -1,16 +1,12 @@
 import 'package:my_sandesh_web_ui/component/text_field_type.dart';
 
 class Configuration {
-  final double containerWidth;
-  final double containerHeight;
+  final FrameConfig frameConfig;
+
   final Map<TextFieldType, TextConfig?> textConfigs;
   final LogoImageConfig? logoImageConfig;
 
-  Configuration(
-      {required this.containerWidth,
-      required this.containerHeight,
-      required this.textConfigs,
-      required this.logoImageConfig});
+  Configuration({required this.frameConfig, required this.textConfigs, required this.logoImageConfig});
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> elementsJson = {};
@@ -23,11 +19,27 @@ class Configuration {
     elementsJson['logoImage'] = logoImageConfig?.toJson();
 
     return {
-      "containerWidth": containerWidth,
-      "containerHeight": containerHeight,
+      "frameConfig": frameConfig,
       "elements": elementsJson,
     };
   }
+}
+
+class FrameConfig {
+  final String name;
+  final String aspectRatio;
+  final double containerWidth;
+  final double containerHeight;
+
+  FrameConfig(
+      {required this.name, required this.aspectRatio, required this.containerWidth, required this.containerHeight});
+
+  Map<String, dynamic> toJson() => {
+        'frameName': name,
+        'aspectRatio': aspectRatio,
+        'containerWidth': containerWidth,
+        'containerHeight': containerHeight,
+      };
 }
 
 class TextConfig {
@@ -72,18 +84,15 @@ class LogoImageConfig {
 class Position {
   final double topMargin;
   final double leftMargin;
-  final double rightMargin;
 
   Position({
     required this.topMargin,
     required this.leftMargin,
-    required this.rightMargin,
   });
 
   Map<String, dynamic> toJson() => {
         'topMargin': topMargin,
         'leftMargin': leftMargin,
-        'rightMargin': rightMargin,
       };
 }
 

@@ -137,9 +137,11 @@ class PreviewScreen extends StatelessWidget {
   }) {
     double scaledFontSize = config.fontSizePercentage * 0.01 * containerWidth;
     TextAlign textAlign = _stringToTextAlign(config.textAlignment);
+    final Color fontColor = Color(int.parse(config.fontColor.substring(1), radix: 16) | 0xFF000000);
 
     final textStyle = TextStyle(
       fontSize: scaledFontSize,
+      color: fontColor,
       fontFamily: config.fontName,
       fontWeight: FontUtils.stringToFontWeight(config.fontWeight),
     );
@@ -152,7 +154,7 @@ class PreviewScreen extends StatelessWidget {
 
     double textWidth = textPainter.width;
 
-    /*// Calculate the starting left position based on the alignment.
+    // Calculate the starting left position based on the alignment.
     double leftPosition;
     if (textAlign == TextAlign.center) {
       leftPosition = (config.textPosition.leftMargin * 0.01 * containerWidth) - (textWidth / 2);
@@ -161,25 +163,8 @@ class PreviewScreen extends StatelessWidget {
       leftPosition = (config.textPosition.leftMargin * 0.01 * containerWidth) - textWidth;
     } else {
       leftPosition = config.textPosition.leftMargin * 0.01 * containerWidth;
-    }*/
-    // Logic for positioning based on text alignment
-    double leftPosition;
-    switch (textAlign) {
-      case TextAlign.left:
-        leftPosition = config.textPosition.leftMargin * 0.01 * containerWidth;
-        break;
-      case TextAlign.center:
-        leftPosition = (config.textPosition.leftMargin * 0.01 * containerWidth) - (textWidth / 2);
-        break;
-      case TextAlign.right:
-        double rightMargin = config.textPosition.rightMargin * 0.01 * containerWidth;
-        // For right-aligned text, align the right edge of the text with the rightMargin
-        leftPosition = containerWidth - rightMargin - textWidth;
-        break;
-      default:
-        leftPosition = config.textPosition.leftMargin * 0.01 * containerWidth;
-        break;
     }
+
 
     // Ensure the position is not negative.
     leftPosition = max(0, leftPosition);
