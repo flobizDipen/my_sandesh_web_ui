@@ -378,6 +378,25 @@ class _MyHomePageState extends State<MyHomePage> {
                     return _textContainer(element);
                   }),
                   if (businessLogo?.selectedLogo != null) _businessLogoContainer(),
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    left: _selectedAspectRatio.sizeExtraLarge.width / 2,
+                    child: Container(
+                      width: 1,
+                      color: Colors.red, // Change color if needed
+                    ),
+                  ),
+                  // Vertical center line
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: _selectedAspectRatio.sizeExtraLarge.height / 2,
+                    child: Container(
+                      height: 1,
+                      color: Colors.red, // Change color if needed
+                    ),
+                  ),
                 ],
               ),
             ),
